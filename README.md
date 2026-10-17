@@ -243,3 +243,5 @@ This verifies:
 5. Simulated payment gateway and pricing calculation math
 6. Admin dashboard authorization, event creation, and procedural seat mapping
 7. Pandas / OpenPyXL CSV and Excel data export integrity
+#   T i x G o  
+ 
