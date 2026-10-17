@@ -1,0 +1,203 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Date-Wise Booking Reports | TixGo Admin{% endblock %}
+
+{% block content %}
+<div class="admin-page-container">
+    <div class="admin-page-header">
+        <div>
+            <h1><i class="fa-solid fa-calendar-check"></i> Date-Wise Booking Reports</h1>
+            <p>Generate and download itemized ticket-level CSV reports filtered by booking creation date with financial breakdowns</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('admin.admin_organizer_reports') }}" class="btn btn-outline">
+                <i class="fa-solid fa-layer-group"></i> Organizer Reports
+            </a>
+        </div>
+    </div>
+
+    <div class="admin-two-col-grid">
+        <!-- Filter and Download Card -->
+        <div class="admin-panel-card">
+            <div class="panel-header">
+                <h3><i class="fa-solid fa-sliders"></i> Report Filter Controls</h3>
+            </div>
+
+            <form id="dateWiseReportForm" class="admin-form" style="padding: 1.5rem 0;" onsubmit="handleDownload(event)">
+                <!-- Event Selection -->
+                <div class="form-group">
+                    <label for="reportEvent"><i class="fa-solid fa-calendar-days"></i> Event Selection</label>
+                    <select id="reportEvent" name="event_id" class="form-control">
+                        <option value="">All Events</option>
+                        {% for ev in events %}
+                            <option value="{{ ev.id }}">{{ ev.name }} ({{ ev.event_type }} - {{ ev.venue }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Primary Booking Date -->
+                <div class="form-group">
+                    <label for="bookingDate"><i class="fa-solid fa-calendar-day"></i> Booking Date (Single Day)</label>
+                    <input type="date" id="bookingDate" name="booking_date" class="form-control" value="{{ today_str }}">
+                    <small class="text-muted">Extracts all bookings created on this specific date.</small>
+                </div>
+
+                <!-- Optional Date Range Toggle -->
+                <div class="form-group" style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="enableDateRange" onchange="toggleDateRange(this.checked)">
+                        <span>Or select a custom Date Range (overrides single date)</span>
+                    </label>
+                </div>
+
+                <div id="dateRangeFields" class="form-row" style="display: none;">
+                    <div class="form-group col-half">
+                        <label for="startDate"><i class="fa-regular fa-calendar"></i> From Date</label>
+                        <input type="date" id="startDate" name="start_date" class="form-control" disabled>
+                    </div>
+                    <div class="form-group col-half">
+                        <label for="endDate"><i class="fa-regular fa-calendar"></i> To Date</label>
+                        <input type="date" id="endDate" name="end_date" class="form-control" disabled>
+                    </div>
+                </div>
+
+                <!-- Status Filters -->
+                <div class="form-row">
+                    <div class="form-group col-half">
+                        <label for="paymentStatus"><i class="fa-solid fa-credit-card"></i> Payment Status</label>
+                        <select id="paymentStatus" name="payment_status" class="form-control">
+                            <option value="ALL">All Payment Statuses</option>
+                            <option value="SUCCESS" selected>SUCCESS (Paid)</option>
+                            <option value="PENDING">PENDING</option>
+                            <option value="FAILED">FAILED</option>
+                            <option value="REFUNDED">REFUNDED</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-half">
+                        <label for="bookingStatus"><i class="fa-solid fa-ticket"></i> Booking Status</label>
+                        <select id="bookingStatus" name="booking_status" class="form-control">
+                            <option value="ALL">All Booking Statuses</option>
+                            <option value="CONFIRMED" selected>CONFIRMED</option>
+                            <option value="PENDING">PENDING</option>
+                            <option value="CANCELLED">CANCELLED</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-actions" style="margin-top: 1.5rem;">
+                    <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+                        <i class="fa-solid fa-file-csv"></i> Download Date-Wise CSV Report
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 29 Columns & Daily Summary Info Card -->
+        <div class="admin-panel-card">
+            <div class="panel-header">
+                <h3><i class="fa-solid fa-circle-info"></i> CSV Report Specification</h3>
+            </div>
+            
+            <div style="padding: 1rem 0;">
+                <h4 style="font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--admin-text-primary);">29 Standard Included Columns:</h4>
+                <div class="columns-badge-cloud" style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.25rem;">
+                    <span class="badge badge-secondary">1. Booking ID</span>
+                    <span class="badge badge-secondary">2. Booking Date</span>
+                    <span class="badge badge-secondary">3. Booking Time</span>
+                    <span class="badge badge-secondary">4. Event Name</span>
+                    <span class="badge badge-secondary">5. Event Category</span>
+                    <span class="badge badge-secondary">6. Event Date</span>
+                    <span class="badge badge-secondary">7. Event Venue</span>
+                    <span class="badge badge-secondary">8. User Name</span>
+                    <span class="badge badge-secondary">9. User ID</span>
+                    <span class="badge badge-secondary">10. Mobile Number</span>
+                    <span class="badge badge-secondary">11. Email Address</span>
+                    <span class="badge badge-secondary">12. Section or Stand Name</span>
+                    <span class="badge badge-secondary">13. Row Name</span>
+                    <span class="badge badge-secondary">14. Seat Number</span>
+                    <span class="badge badge-secondary">15. Number of Tickets</span>
+                    <span class="badge badge-secondary">16. Price Per Ticket</span>
+                    <span class="badge badge-secondary">17. Base Ticket Amount</span>
+                    <span class="badge badge-secondary">18. Discount Amount</span>
+                    <span class="badge badge-secondary">19. Convenience Fee</span>
+                    <span class="badge badge-secondary">20. Booking Fee</span>
+                    <span class="badge badge-secondary">21. Other Extra Charges</span>
+                    <span class="badge badge-secondary">22. Tax Amount</span>
+                    <span class="badge badge-secondary">23. Total Payable Amount</span>
+                    <span class="badge badge-secondary">24. Actual Amount Paid</span>
+                    <span class="badge badge-secondary">25. Pending Amount</span>
+                    <span class="badge badge-secondary">26. Payment Method</span>
+                    <span class="badge badge-secondary">27. Transaction ID</span>
+                    <span class="badge badge-secondary">28. Payment Status</span>
+                    <span class="badge badge-secondary">29. Booking Status</span>
+                </div>
+
+                <h4 style="font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--admin-text-primary);">Daily Final Summary (at bottom of CSV):</h4>
+                <ul style="padding-left: 1.25rem; font-size: 0.875rem; color: var(--admin-text-muted); line-height: 1.6;">
+                    <li><strong>Total Unique Users:</strong> Distinct count of customer accounts.</li>
+                    <li><strong>Total Bookings:</strong> Distinct count of reservations.</li>
+                    <li><strong>Total Tickets Booked:</strong> Total individual seats/tickets itemized.</li>
+                    <li><strong>Total Base Ticket Amount:</strong> Sum of ticket face values.</li>
+                    <li><strong>Total Extra Charges:</strong> Applicable convenience fees and GST taxes.</li>
+                    <li><strong>Total Discounts:</strong> Applicable promo code reductions.</li>
+                    <li><strong>Total Payable Amount:</strong> Grand total billed according to pricing rules.</li>
+                    <li><strong>Total Actual Amount Paid:</strong> Successfully collected payments.</li>
+                    <li><strong>Total Pending Amount:</strong> Outstanding balances.</li>
+                    <li><strong>Total Refunded Amount:</strong> Amounts returned for cancellations.</li>
+                </ul>
+
+                <div style="margin-top: 1rem; padding: 0.75rem; background: #fff8e1; border-left: 4px solid #ffb300; border-radius: 4px; font-size: 0.85rem; color: #856404;">
+                    <i class="fa-solid fa-shield-halved"></i> <strong>Financial Safety & Injection Mitigation:</strong> Multi-seat bookings distribute convenience fees and tax proportionately across tickets without multiplying booking charges. All cells beginning with formulas (=, +, -, @) are sanitized.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleDateRange(enabled) {
+    const rangeFields = document.getElementById('dateRangeFields');
+    const startInput = document.getElementById('startDate');
+    const endInput = document.getElementById('endDate');
+    const singleDateInput = document.getElementById('bookingDate');
+
+    if (enabled) {
+        rangeFields.style.display = 'flex';
+        startInput.disabled = false;
+        endInput.disabled = false;
+        singleDateInput.disabled = true;
+    } else {
+        rangeFields.style.display = 'none';
+        startInput.disabled = true;
+        endInput.disabled = true;
+        singleDateInput.disabled = false;
+    }
+}
+
+function handleDownload(e) {
+    e.preventDefault();
+    const eventId = document.getElementById('reportEvent').value;
+    const isRange = document.getElementById('enableDateRange').checked;
+    const singleDate = document.getElementById('bookingDate').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const paymentStatus = document.getElementById('paymentStatus').value;
+    const bookingStatus = document.getElementById('bookingStatus').value;
+
+    const params = new URLSearchParams();
+    if (eventId) params.append('event_id', eventId);
+    if (isRange) {
+        if (startDate) params.append('start_date', startDate);
+        if (endDate) params.append('end_date', endDate);
+    } else {
+        if (singleDate) params.append('booking_date', singleDate);
+    }
+    if (paymentStatus) params.append('payment_status', paymentStatus);
+    if (bookingStatus) params.append('booking_status', bookingStatus);
+
+    window.location.href = "{{ url_for('admin.admin_download_date_wise_csv') }}?" + params.toString();
+}
+</script>
+{% endblock %}

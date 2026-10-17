@@ -1,0 +1,1361 @@
+/* =======================================================
+   ShowSpot Dynamic Seat Map & Locking Stylesheet
+   ======================================================= */
+
+.seat-booking-page {
+    padding-bottom: 7rem; /* Space for sticky bottom bar */
+}
+
+/* Quick Header & Legend Bar */
+.seat-map-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1.25rem 0;
+}
+
+.seat-header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+}
+
+.seat-event-name {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--dark);
+    margin-bottom: 0.25rem;
+}
+
+.seat-event-meta {
+    display: flex;
+    gap: 1.25rem;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.seat-event-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+/* Legend Box */
+.seat-legend-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.25rem;
+    background: #ffffff;
+    padding: 0.55rem 1.25rem;
+    border-radius: var(--radius-full);
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: #374151;
+    user-select: none;
+}
+
+.legend-seat {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.legend-seat.available {
+    background: #ecfdf5;
+    border: 1.5px solid #10b981;
+    color: #047857;
+    box-shadow: 0 1px 3px rgba(16, 185, 129, 0.15);
+}
+
+.legend-seat.selected {
+    background: var(--primary);
+    border: 1.5px solid var(--primary);
+    color: #ffffff;
+    box-shadow: 0 0 8px rgba(234, 88, 12, 0.4);
+}
+
+.legend-seat.locked {
+    background: #fef3c7;
+    border: 1.5px solid #f59e0b;
+    color: #d97706;
+}
+
+.legend-seat.locked i {
+    font-size: 0.62rem;
+}
+
+.legend-seat.booked {
+    background: #fee2e2;
+    border: 1.5px solid #ef4444;
+    color: #b91c1c;
+}
+
+.legend-seat.booked i {
+    font-size: 0.62rem;
+}
+
+.legend-seat.admin-locked {
+    background: #f3e8ff;
+    border: 1.5px solid #a855f7;
+    color: #7e22ce;
+}
+
+.legend-seat.admin-locked i {
+    font-size: 0.62rem;
+}
+
+/* Stand Selector Bar (Cricket) */
+.stadium-stand-selector-bar {
+    background: #18181b;
+    color: #ffffff;
+    padding: 1.15rem 0;
+    border-bottom: 1px solid #27272a;
+}
+
+.stadium-nav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
+}
+
+.stand-tabs-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.stand-selector-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #a1a1aa;
+    margin-right: 0.25rem;
+}
+
+.stand-tab {
+    background: #27272a;
+    color: #e4e4e7;
+    border: 1px solid #3f3f46;
+    padding: 0.4rem 1rem;
+    border-radius: var(--radius-full);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.stand-tab:hover {
+    background: #3f3f46;
+    color: #ffffff;
+    border-color: #71717a;
+}
+
+.stand-tab.active {
+    background: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+    box-shadow: 0 0 14px rgba(229, 9, 20, 0.45);
+}
+
+.view-toggle-btn {
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.35rem 0.9rem;
+    border-color: #52525b;
+    color: #f4f4f5;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.view-toggle-btn.active {
+    background: #3f3f46;
+    border-color: #71717a;
+}
+
+.tier-sub-filter {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.tier-btn {
+    background: #27272a;
+    border: 1px solid #3f3f46;
+    color: #d4d4d8;
+    padding: 0.3rem 0.85rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tier-btn:hover {
+    background: #3f3f46;
+    color: #ffffff;
+}
+
+.tier-btn.active {
+    background: #52525b;
+    color: #ffffff;
+    border-color: #a1a1aa;
+    font-weight: 700;
+}
+
+/* 360° Circular Cricket Stadium SVG & Container */
+.cricket-360-stadium-wrapper {
+    background: #09090b;
+    border-radius: var(--radius-lg);
+    padding: 1.75rem 1rem;
+    margin-bottom: 2rem;
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8), 0 10px 30px rgba(0, 0, 0, 0.12);
+    border: 1px solid #27272a;
+    color: #ffffff;
+}
+
+.cricket-360-stadium-wrapper.hidden {
+    display: none;
+}
+
+.stadium-header-pill {
+    text-align: center;
+    margin-bottom: 1.25rem;
+}
+
+.stadium-header-pill h3 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #f4f4f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 0.35rem;
+}
+
+.stadium-header-pill p {
+    font-size: 0.85rem;
+    color: #a1a1aa;
+}
+
+.circular-stadium-svg-container {
+    max-width: 580px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.stadium-360-svg {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 15px 25px rgba(0,0,0,0.6));
+    user-select: none;
+}
+
+/* SVG Elements Styling */
+.stadium-outer-ring {
+    fill: #18181b;
+    stroke: #27272a;
+    stroke-width: 3;
+}
+
+.floodlight-pole {
+    fill: #27272a;
+    stroke: #facc15;
+    stroke-width: 3;
+    filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.6));
+}
+
+.floodlight-text {
+    fill: #fef08a;
+    font-size: 8px;
+    font-weight: 800;
+    text-anchor: middle;
+}
+
+/* Stand Sector Paths */
+.stand-sector {
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    stroke-width: 2.5;
+    stroke: #18181b;
+    opacity: 0.9;
+}
+
+.stand-sector:hover {
+    opacity: 1;
+    stroke: #ffffff;
+    stroke-width: 4;
+    filter: brightness(1.2) drop-shadow(0 0 12px rgba(255, 255, 255, 0.5));
+    transform-origin: 400px 400px;
+}
+
+.stand-sector.active {
+    opacity: 1;
+    stroke: #ffffff;
+    stroke-width: 5;
+    filter: drop-shadow(0 0 18px rgba(229, 9, 20, 0.8));
+}
+
+/* Stand Color Accents matching Reference Chepauk Stadium */
+.stand-e { fill: #a3e635; } /* Lime Green */
+.stand-d { fill: #38bdf8; } /* Cyan */
+.stand-c { fill: #f43f5e; } /* Rose */
+.stand-b { fill: #60a5fa; } /* Sky Blue */
+.stand-a { fill: #facc15; } /* Gold Yellow */
+.stand-pavilion { fill: #ec4899; } /* Magenta Pink */
+.stand-i { fill: #facc15; } /* Gold Yellow */
+.stand-h { fill: #c084fc; } /* Lavender Purple */
+.stand-g { fill: #a855f7; } /* Violet */
+.stand-f { fill: #fb923c; } /* Orange */
+
+.lower-sector {
+    stroke-dasharray: none;
+    filter: saturate(1.05);
+}
+
+.upper-sector {
+    stroke-dasharray: none;
+    filter: brightness(1.05);
+}
+
+.stand-svg-label {
+    fill: #09090b;
+    font-size: 8.5px;
+    font-weight: 800;
+    text-anchor: middle;
+    pointer-events: none;
+    letter-spacing: 0.3px;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.inner-label {
+    font-size: 8px;
+    fill: #18181b;
+    font-weight: 800;
+}
+
+.outer-label {
+    font-size: 8.5px;
+    fill: #09090b;
+    font-weight: 900;
+}
+
+.pavilion-label {
+    fill: #ffffff !important;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+}
+
+/* Cricket Ground Styling */
+.cricket-outfield {
+    fill: #15803d;
+    stroke: #22c55e;
+    stroke-width: 4;
+    filter: drop-shadow(inset 0 0 15px rgba(0,0,0,0.5));
+}
+
+.cricket-inner-circle {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.4);
+    stroke-width: 2;
+    stroke-dasharray: 6,4;
+}
+
+.cricket-pitch-strip {
+    fill: #fef08a;
+    stroke: #ca8a04;
+    stroke-width: 1.5;
+}
+
+.pitch-crease-line {
+    stroke: #ffffff;
+    stroke-width: 2;
+}
+
+.pitch-stump {
+    fill: #ffffff;
+}
+
+.compass-label {
+    fill: rgba(255, 255, 255, 0.35);
+    font-size: 10px;
+    font-weight: 700;
+    text-anchor: middle;
+    letter-spacing: 1px;
+    pointer-events: none;
+}
+
+/* Active Stand Banner */
+.active-stand-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1.25rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.active-stand-title {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+}
+
+.active-stand-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 8px rgba(229, 9, 20, 0.6);
+    display: inline-block;
+}
+
+.active-stand-title h3 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--dark);
+    margin: 0;
+}
+
+.active-stand-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-full);
+}
+
+.badge-all {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+
+.badge-lower {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.badge-upper {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.stand-pricing-tag {
+    background: #e0f2fe;
+    color: #0369a1;
+    font-weight: 800;
+    font-size: 0.88rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-full);
+}
+
+.section-block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 0.4rem;
+}
+
+.section-seat-capacity {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-full);
+}
+
+/* Seat Map Viewport */
+.seat-map-main-wrapper {
+    padding: 2.5rem 1.25rem;
+}
+
+.seat-layout-card {
+    background: #ffffff;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #e5e7eb;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    min-height: 450px;
+    overflow-x: auto;
+    position: relative;
+}
+
+/* Floating Zoom Toolbar */
+.seat-map-zoom-toolbar {
+    position: sticky;
+    top: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(10px);
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border-radius: var(--radius-full);
+    padding: 0.35rem 0.65rem;
+    margin: 0 auto 1.75rem auto;
+    z-index: 10;
+    transition: var(--transition);
+}
+
+.zoom-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    color: var(--dark);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.zoom-btn:hover:not(:disabled) {
+    background: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+    transform: scale(1.08);
+}
+
+.zoom-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.zoom-level-badge {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--dark);
+    min-width: 48px;
+    text-align: center;
+    user-select: none;
+    padding: 0 0.25rem;
+}
+
+.zoom-reset-btn {
+    width: auto;
+    border-radius: var(--radius-full);
+    padding: 0 0.75rem;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.seat-grid-viewport {
+    transform-origin: top center;
+    transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    will-change: transform;
+}
+
+/* Screen Direction Banners */
+.screen-direction-container {
+    max-width: 650px;
+    margin: 0 auto 3rem;
+}
+
+.cinema-screen-curve {
+    height: 12px;
+    background: linear-gradient(180deg, #d1d5db 0%, transparent 100%);
+    border-top: 5px solid #9ca3af;
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    margin-bottom: 0.5rem;
+}
+
+.screen-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #9ca3af;
+    letter-spacing: 2px;
+}
+
+.stage-direction-container {
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+}
+
+.concert-stage-banner, .general-stage-banner {
+    background: linear-gradient(90deg, #1f1f1f 0%, #E50914 50%, #1f1f1f 100%);
+    color: #ffffff;
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 1.5px;
+    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.25);
+}
+
+/* Dynamic Section Blocks */
+.seat-section-block {
+    margin-bottom: 2.5rem;
+}
+
+.section-block-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #4b5563;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1.25rem;
+    display: inline-block;
+    padding-bottom: 0.35rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+/* Seat Row Container */
+.seat-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+}
+
+.row-label {
+    width: 26px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #9ca3af;
+    text-align: right;
+    margin-right: 0.35rem;
+}
+
+/* Individual Seat Element */
+.seat {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    font-family: var(--font-main);
+    border: 1.5px solid #d1d5db;
+    cursor: pointer;
+    transition: var(--transition);
+    user-select: none;
+}
+
+/* State: Available (Green) */
+.seat.available {
+    background: #ecfdf5;
+    border-color: #10b981;
+    color: #047857;
+}
+
+.seat.available:hover {
+    background: #d1fae5;
+    border-color: #059669;
+    color: #065f46;
+    transform: scale(1.15);
+    z-index: 10;
+}
+
+/* State: Selected (By Current User) */
+.seat.selected {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(234, 88, 12, 0.4);
+    transform: scale(1.08);
+}
+
+/* State: Locked (Temporarily reserved by another user) */
+.seat.locked {
+    background: #fef3c7;
+    border-color: #f59e0b;
+    color: #d97706;
+    cursor: not-allowed;
+    font-size: 0.65rem;
+}
+
+/* State: Booked (Red) */
+.seat.booked {
+    background: #fee2e2;
+    border-color: #ef4444;
+    color: #b91c1c;
+    cursor: not-allowed;
+}
+
+.seat.booked::after {
+    content: '✕';
+    font-size: 0.75rem;
+}
+
+/* State: Admin Locked / Reserved for Resource Persons & VIPs */
+.seat.admin-locked,
+.seat.admin_locked {
+    background: #f3e8ff;
+    border-color: #a855f7;
+    color: #7e22ce;
+    cursor: not-allowed;
+    box-shadow: 0 1px 3px rgba(168, 85, 247, 0.2);
+}
+
+.seat.admin-locked:hover,
+.seat.admin_locked:hover {
+    transform: none;
+    background: #ede9fe;
+}
+
+.seat.admin-locked i,
+.seat.admin_locked i {
+    font-size: 0.68rem;
+}
+
+/* Loading State */
+.seat-loading-state {
+    padding: 4rem 1rem;
+    color: #6b7280;
+    font-size: 1.1rem;
+}
+
+.seat-loading-state i {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+    display: block;
+}
+
+/* =======================================================
+   Sticky Bottom Summary Bar
+   ======================================================= */
+
+.sticky-seat-summary-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #141414;
+    color: #ffffff;
+    border-top: 1px solid #2e2e2e;
+    box-shadow: 0 -8px 25px rgba(0,0,0,0.3);
+    z-index: 999;
+    padding: 0.85rem 0;
+}
+
+.sticky-summary-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.selected-seats-info {
+    flex: 1;
+    min-width: 240px;
+}
+
+.selected-count-badge {
+    font-size: 0.82rem;
+    color: #9ca3af;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.selected-count-badge #selectedCount {
+    color: var(--primary);
+    font-weight: 800;
+    font-size: 1rem;
+}
+
+.selected-seats-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+.selected-chip {
+    background: #2b2b2b;
+    border: 1px solid #444444;
+    color: #ffffff;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.no-selection-hint {
+    font-size: 0.82rem;
+    color: #6b7280;
+    font-style: italic;
+}
+
+/* Live Lock Countdown Box */
+.lock-countdown-box {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    background: rgba(229, 9, 20, 0.15);
+    border: 1px solid rgba(229, 9, 20, 0.4);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+}
+
+.lock-countdown-box .pulse-icon {
+    color: var(--primary);
+    font-size: 1.25rem;
+}
+
+.countdown-label {
+    display: block;
+    font-size: 0.72rem;
+    color: #d1d5db;
+    text-transform: uppercase;
+}
+
+.countdown-digits {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #ff6b6b;
+    letter-spacing: 1px;
+}
+
+.price-and-proceed-box {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.total-price-display {
+    text-align: right;
+}
+
+.total-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+}
+
+.total-amount-val {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+@media (max-width: 768px) {
+    .seat {
+        width: 26px;
+        height: 26px;
+        font-size: 0.65rem;
+    }
+    .sticky-summary-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    .price-and-proceed-box {
+        justify-content: space-between;
+    }
+}
+
+/* =======================================================
+   CRICKET MATCH DEDICATED STADIUM & TICKET LISTING STYLES
+   Exact Match to User UI Specification
+   ======================================================= */
+
+.cricket-selling-fast-strip {
+    background: #fff1f2;
+    border-bottom: 1px solid #fecdd3;
+    padding: 0.65rem 0;
+    font-size: 0.88rem;
+}
+
+.selling-fast-badge {
+    background: #f43f5e;
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 0.78rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-right: 0.75rem;
+}
+
+.selling-fast-note {
+    color: #9f1239;
+    font-weight: 600;
+}
+
+.cricket-booking-main-container {
+    padding: 1.75rem 1rem 6rem 1rem;
+}
+
+.cricket-split-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(350px, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+}
+
+/* Left Column: Circular Stadium Card */
+.cricket-stadium-card {
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at center, #ffffff 60%, #f8fafc 100%);
+}
+
+/* Zoom Floating Controls */
+.stadium-zoom-pill {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.stadium-zoom-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: #ffffff;
+    color: #374151;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+}
+
+.stadium-zoom-btn:hover {
+    background: #f1f5f9;
+    color: #111827;
+}
+
+.zoom-divider {
+    height: 1px;
+    background: #e2e8f0;
+    width: 100%;
+}
+
+.stadium-map-scroll-area {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.cricket-stadium-svg {
+    width: 100%;
+    max-width: 580px;
+    height: auto;
+    transition: transform 0.25s ease-out;
+    transform-origin: center center;
+    user-select: none;
+}
+
+.svg-stadium-base-ring {
+    fill: #ffffff;
+    stroke: #e2e8f0;
+    stroke-width: 2px;
+}
+
+/* Stand Sectors */
+.stadium-sector {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.stand-active {
+    fill: #bef264;
+    stroke: #ffffff;
+    stroke-width: 2.5px;
+}
+
+.stand-active:hover {
+    fill: #a3e635;
+    filter: url(#activeGlow);
+}
+
+.stand-active.sector-selected {
+    fill: #84cc16;
+    stroke: #15803d;
+    stroke-width: 4px;
+    filter: url(#activeGlow);
+}
+
+.stand-inactive {
+    fill: #e5e7eb;
+    stroke: #ffffff;
+    stroke-width: 2px;
+    cursor: default;
+}
+
+.svg-sector-label-gray {
+    fill: #6b7280;
+    font-size: 9px;
+    font-weight: 800;
+    text-anchor: middle;
+    pointer-events: none;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Outfield & Pitch */
+.cricket-pitch-circle {
+    fill: #84cc16;
+    stroke: #65a30d;
+    stroke-width: 3.5px;
+}
+
+.cricket-thirty-yard-circle {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.45);
+    stroke-width: 2px;
+    stroke-dasharray: 6,4;
+}
+
+.cricket-center-pitch-strip {
+    fill: #f59e0b;
+    stroke: #ffffff;
+    stroke-width: 2px;
+}
+
+.cricket-white-crease {
+    stroke: #ffffff;
+    stroke-width: 2px;
+}
+
+/* Floating Price Badges */
+.floating-badge-pill {
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.floating-badge-pill:hover {
+    transform: scale(1.1);
+}
+
+.pill-badge-price {
+    font-size: 8.8px;
+    font-weight: 800;
+    fill: #111827;
+    text-anchor: middle;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.pill-badge-title {
+    font-size: 6.8px;
+    font-weight: 700;
+    fill: #4b5563;
+    text-anchor: middle;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: 0.2px;
+}
+
+/* Right Column: Ticket Listings Panel */
+.cricket-listings-panel {
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    max-height: 640px;
+}
+
+.listings-action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid #f1f5f9;
+    background: #ffffff;
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+}
+
+.filter-icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background 0.15s;
+}
+
+.filter-icon-btn:hover {
+    background: #f8fafc;
+    color: #111827;
+}
+
+.ticket-qty-pill {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1.5px solid #86efac;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.cricket-qty-dropdown {
+    border: none;
+    background: transparent;
+    font-weight: 700;
+    color: #15803d;
+    font-size: 0.9rem;
+    padding: 0.4rem 2rem 0.4rem 0.75rem;
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+    font-family: inherit;
+}
+
+.qty-arrow {
+    position: absolute;
+    right: 0.75rem;
+    pointer-events: none;
+    font-size: 0.7rem;
+    color: #15803d;
+}
+
+/* Stand Cards List */
+.stand-cards-scroll-container {
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    flex: 1;
+}
+
+.cricket-ticket-card {
+    background: #ffffff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.cricket-ticket-card:hover {
+    border-color: #86efac;
+    box-shadow: 0 4px 14px rgba(22, 163, 74, 0.08);
+    transform: translateY(-1px);
+}
+
+.cricket-ticket-card.selected-card {
+    border-color: #16a34a;
+    background: #f0fdf4;
+    box-shadow: 0 4px 16px rgba(22, 163, 74, 0.14);
+}
+
+.card-main-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.card-left-info {
+    flex: 1;
+}
+
+.card-stand-name {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #111827;
+    margin: 0 0 0.15rem 0;
+}
+
+.card-row-info {
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-weight: 600;
+    margin-bottom: 0.55rem;
+}
+
+.card-features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0.65rem 0;
+    font-size: 0.82rem;
+    color: #4b5563;
+    line-height: 1.6;
+}
+
+.card-features-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.card-features-list li i {
+    color: #16a34a;
+    font-size: 0.8rem;
+    width: 14px;
+}
+
+.card-features-list li i.fa-triangle-exclamation {
+    color: #f59e0b;
+}
+
+/* Deal Tags */
+.card-tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+}
+
+.tag-best-price, .tag-best-deal {
+    background: #ecfdf5;
+    color: #15803d;
+    border: 1px solid #a7f3d0;
+}
+
+.tag-only-left {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.tag-selling-fast {
+    background: #fff7ed;
+    color: #ea580c;
+    border: 1px solid #fed7aa;
+}
+
+/* Right Section of Card */
+.card-right-info {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.45rem;
+}
+
+.card-price-value {
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #111827;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+}
+
+.card-price-calc {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #15803d;
+    background: #f0fdf4;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    border: 1px solid #bbf7d0;
+    margin-top: -0.1rem;
+    display: inline-block;
+}
+
+.card-unit-price {
+    font-size: 0.72rem;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.card-rating-badge {
+    font-size: 0.78rem;
+    font-weight: 800;
+    background: #15803d;
+    color: #ffffff;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.card-select-btn {
+    margin-top: 0.4rem;
+    background: #ffffff;
+    border: 1.5px solid #16a34a;
+    color: #15803d;
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.card-select-btn:hover, .cricket-ticket-card.selected-card .card-select-btn {
+    background: #16a34a;
+    color: #ffffff;
+}
+
+@media (max-width: 992px) {
+    .cricket-split-layout {
+        grid-template-columns: 1fr;
+    }
+    .cricket-listings-panel {
+        max-height: none;
+    }
+}

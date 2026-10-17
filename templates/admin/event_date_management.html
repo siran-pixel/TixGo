@@ -1,0 +1,204 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Event Date Management (Nov 2026) | TixGo Admin{% endblock %}
+
+{% block content %}
+<div class="admin-page-container">
+    <div class="admin-page-header">
+        <div>
+            <h1><i class="fa-solid fa-clock-rotate-left"></i> Event Date Management (November 2026)</h1>
+            <p>Review and reschedule event dates to November 2026 while preserving seat layouts, pricing, and historical booking timestamps</p>
+        </div>
+        <div class="header-actions">
+            <button type="button" class="btn btn-primary" onclick="confirmSyncAllNovember()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Sync All Events to November 2026
+            </button>
+        </div>
+    </div>
+
+    <!-- Overview Metrics / Notice -->
+    <div style="margin-bottom: 1.5rem; padding: 1rem 1.25rem; background: #e0f2fe; border-left: 4px solid #0284c7; border-radius: 6px; font-size: 0.9rem; color: #0369a1; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <strong><i class="fa-solid fa-circle-check"></i> Integrity Guarantee:</strong> Updating an event date updates the event in-place. All existing seat layouts, VIP reservations, user bookings, payments, and QR tickets are fully preserved.
+        </div>
+        <div>
+            <span class="badge badge-info" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">
+                Total Events: {{ events|length }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Events Management Table Card -->
+    <div class="admin-panel-card">
+        <div class="panel-header">
+            <h3><i class="fa-solid fa-list-check"></i> Events Schedule & Date Reassignment</h3>
+        </div>
+
+        <div class="table-responsive" style="padding: 1rem 0;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">ID</th>
+                        <th>Event Details</th>
+                        <th>Category</th>
+                        <th>Venue & City</th>
+                        <th>Current Scheduled Date</th>
+                        <th>Status</th>
+                        <th style="width: 320px;">November 2026 Reschedule</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ev in events %}
+                    <tr id="eventRow-{{ ev.id }}">
+                        <td><strong>#{{ ev.id }}</strong></td>
+                        <td>
+                            <div style="font-weight: 600; color: var(--admin-text-primary);">{{ ev.name }}</div>
+                            <small class="text-muted">{{ ev.total_seats }} total capacity</small>
+                        </td>
+                        <td>
+                            <span class="badge badge-secondary">{{ ev.event_type }}</span>
+                        </td>
+                        <td>
+                            <div>{{ ev.venue }}</div>
+                            <small class="text-muted">{{ ev.city }}</small>
+                        </td>
+                        <td>
+                            <div style="font-weight: 600;" id="currentDateDisplay-{{ ev.id }}">
+                                {{ ev.event_date.strftime('%d %b %Y') if ev.event_date else 'N/A' }}
+                            </div>
+                            <small class="text-muted" id="currentTimeDisplay-{{ ev.id }}">
+                                {{ ev.event_time.strftime('%H:%M') if ev.event_time else '' }}
+                            </small>
+                        </td>
+                        <td>
+                            {% if ev.event_date and ev.event_date.year == 2026 and ev.event_date.month == 11 %}
+                                <span class="badge badge-success" id="novBadge-{{ ev.id }}"><i class="fa-solid fa-check"></i> Nov 2026</span>
+                            {% else %}
+                                <span class="badge badge-warning" id="novBadge-{{ ev.id }}"><i class="fa-solid fa-clock"></i> Needs Update</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form onsubmit="updateSingleDate(event, {{ ev.id }})" style="display: flex; gap: 0.5rem; align-items: center;">
+                                <input type="date" 
+                                       id="dateInput-{{ ev.id }}" 
+                                       class="form-control form-control-sm" 
+                                       value="{{ ev.event_date.strftime('%Y-%m-%d') if ev.event_date else '2026-11-15' }}"
+                                       min="2026-11-01" 
+                                       max="2026-11-30" 
+                                       required 
+                                       style="width: 145px;">
+                                <input type="time" 
+                                       id="timeInput-{{ ev.id }}" 
+                                       class="form-control form-control-sm" 
+                                       value="{{ ev.event_time.strftime('%H:%M') if ev.event_time else '19:00' }}" 
+                                       style="width: 95px;">
+                                <button type="submit" class="btn btn-primary btn-sm" id="btnUpdate-{{ ev.id }}" title="Save November 2026 Date">
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function updateSingleDate(e, eventId) {
+    e.preventDefault();
+    const dateInput = document.getElementById(`dateInput-${eventId}`);
+    const timeInput = document.getElementById(`timeInput-${eventId}`);
+    const btn = document.getElementById(`btnUpdate-${eventId}`);
+
+    const newDate = dateInput.value;
+    const newTime = timeInput.value;
+
+    if (!newDate) {
+        alert("Please pick a valid date.");
+        return;
+    }
+
+    const parts = newDate.split('-');
+    if (parts[0] !== '2026' || parts[1] !== '11') {
+        alert("Date must be in November 2026 (between 2026-11-01 and 2026-11-30).");
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+    try {
+        const res = await fetch("{{ url_for('admin.api_update_event_date_single') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                event_id: eventId,
+                new_date: newDate,
+                new_time: newTime
+            })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            // Update UI
+            const [y, m, d] = newDate.split('-');
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const formatted = `${d} ${months[parseInt(m, 10)-1]} ${y}`;
+
+            document.getElementById(`currentDateDisplay-${eventId}`).textContent = formatted;
+            document.getElementById(`currentTimeDisplay-${eventId}`).textContent = newTime;
+            
+            const badge = document.getElementById(`novBadge-${eventId}`);
+            badge.className = 'badge badge-success';
+            badge.innerHTML = '<i class="fa-solid fa-check"></i> Nov 2026';
+
+            btn.className = 'btn btn-success btn-sm';
+            btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+            setTimeout(() => {
+                btn.className = 'btn btn-primary btn-sm';
+                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i>';
+                btn.disabled = false;
+            }, 1800);
+        } else {
+            alert(data.message || "Failed to update date.");
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i>';
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Network error updating event date.");
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i>';
+    }
+}
+
+async function confirmSyncAllNovember() {
+    if (!confirm("Are you sure you want to automatically schedule all events to spread dates across November 2026? All existing seat configurations and bookings will be safely preserved.")) {
+        return;
+    }
+
+    try {
+        const res = await fetch("{{ url_for('admin.api_sync_all_events_november') }}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert(data.message);
+            window.location.reload();
+        } else {
+            alert(data.message || "Failed to sync events.");
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Network error syncing events.");
+    }
+}
+</script>
+{% endblock %}

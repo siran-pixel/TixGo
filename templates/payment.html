@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}Simulated Payment Gateway - {{ event.name }} | ShowSpot{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="booking-flow-page">
+    <!-- Stepper -->
+    <div class="stepper-container">
+        <div class="stepper-wrapper">
+            <div class="step-item completed"><div class="step-circle"><i class="fa-solid fa-check"></i></div><span class="step-label">Event</span></div>
+            <div class="step-line completed"></div>
+            <div class="step-item completed"><div class="step-circle"><i class="fa-solid fa-check"></i></div><span class="step-label">Seats</span></div>
+            <div class="step-line completed"></div>
+            <div class="step-item completed"><div class="step-circle"><i class="fa-solid fa-check"></i></div><span class="step-label">Attendees</span></div>
+            <div class="step-line completed"></div>
+            <div class="step-item completed"><div class="step-circle"><i class="fa-solid fa-check"></i></div><span class="step-label">Review</span></div>
+            <div class="step-line active"></div>
+            <div class="step-item active"><div class="step-circle">5</div><span class="step-label">Payment</span></div>
+            <div class="step-line"></div>
+            <div class="step-item"><div class="step-circle">6</div><span class="step-label">Ticket</span></div>
+        </div>
+    </div>
+
+    <div class="section-container">
+        <div class="booking-layout-grid">
+            <!-- Payment Method Main Column -->
+            <div class="booking-main-col">
+                <div class="booking-card payment-gateway-card">
+                    <div class="payment-card-header">
+                        <div class="secure-badge">
+                            <i class="fa-solid fa-lock"></i> 256-Bit SSL Encrypted Sandbox Gateway
+                        </div>
+                        <h2>Choose Payment Method</h2>
+                        <p>Complete your simulated payment to generate and claim your official QR tickets.</p>
+                    </div>
+
+                    <!-- Payment Method Tabs -->
+                    <div class="payment-tabs-nav" id="paymentTabs">
+                        <button type="button" class="pay-tab-btn active" data-method="UPI" onclick="switchPaymentTab('UPI', this)">
+                            <i class="fa-solid fa-mobile-screen-button"></i>
+                            <span>UPI (GPay / PhonePe / Paytm)</span>
+                        </button>
+                        <button type="button" class="pay-tab-btn" data-method="CREDIT_CARD" onclick="switchPaymentTab('CREDIT_CARD', this)">
+                            <i class="fa-regular fa-credit-card"></i>
+                            <span>Credit Card</span>
+                        </button>
+                        <button type="button" class="pay-tab-btn" data-method="DEBIT_CARD" onclick="switchPaymentTab('DEBIT_CARD', this)">
+                            <i class="fa-solid fa-credit-card"></i>
+                            <span>Debit Card / ATM</span>
+                        </button>
+                        <button type="button" class="pay-tab-btn" data-method="NET_BANKING" onclick="switchPaymentTab('NET_BANKING', this)">
+                            <i class="fa-solid fa-building-columns"></i>
+                            <span>Net Banking</span>
+                        </button>
+                    </div>
+
+                    <!-- Payment Panels -->
+                    <div class="payment-panels-container">
+                        <!-- UPI Panel -->
+                        <div class="payment-panel active" id="panelUPI">
+                            <div class="upi-option-box">
+                                <h4><i class="fa-solid fa-qrcode"></i> Instant UPI QR & VPA</h4>
+                                <p class="panel-subtitle">Scan via any UPI App or enter your Virtual Payment Address</p>
+                                
+                                <div class="upi-qr-mock-box">
+                                    <div class="mock-qr-graphic">
+                                        <i class="fa-solid fa-qrcode"></i>
+                                    </div>
+                                    <span class="qr-mock-caption">Scan to pay ₹{{ "%.2f"|format(pricing.total_amount) }} with any UPI App</span>
+                                </div>
+
+                                <div class="or-separator"><span>OR ENTER UPI ID</span></div>
+
+                                <div class="form-group">
+                                    <label for="upiId"><i class="fa-solid fa-at"></i> UPI ID / VPA</label>
+                                    <input type="text" id="upiId" class="form-control" placeholder="e.g. yourname@okhdfcbank" value="demo.user@okhdfcbank">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Credit Card Panel -->
+                        <div class="payment-panel" id="panelCREDIT_CARD">
+                            <div class="card-option-box">
+                                <h4><i class="fa-brands fa-cc-visa"></i> Credit Card Payment</h4>
+                                <div class="form-group">
+                                    <label for="ccNumber"><i class="fa-regular fa-credit-card"></i> Card Number</label>
+                                    <input type="text" id="ccNumber" class="form-control" placeholder="4532 8901 2345 6789" value="4532 8901 2345 6789">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-half">
+                                        <label for="ccExpiry">Expiry Date (MM/YY)</label>
+                                        <input type="text" id="ccExpiry" class="form-control" placeholder="12/28" value="12/28">
+                                    </div>
+                                    <div class="form-group col-half">
+                                        <label for="ccCvv">CVV / CVC</label>
+                                        <input type="password" id="ccCvv" class="form-control" placeholder="123" maxlength="4" value="123">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="ccHolder">Cardholder Name</label>
+                                    <input type="text" id="ccHolder" class="form-control" placeholder="Name as printed on card" value="{{ current_user.full_name if current_user else 'Cardholder' }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Debit Card Panel -->
+                        <div class="payment-panel" id="panelDEBIT_CARD">
+                            <div class="card-option-box">
+                                <h4><i class="fa-brands fa-cc-mastercard"></i> Debit Card Payment</h4>
+                                <div class="form-group">
+                                    <label for="dcNumber"><i class="fa-solid fa-credit-card"></i> Debit Card Number</label>
+                                    <input type="text" id="dcNumber" class="form-control" placeholder="5241 6789 0123 4567" value="5241 6789 0123 4567">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-half">
+                                        <label for="dcExpiry">Expiry (MM/YY)</label>
+                                        <input type="text" id="dcExpiry" class="form-control" placeholder="08/29" value="08/29">
+                                    </div>
+                                    <div class="form-group col-half">
+                                        <label for="dcCvv">CVV</label>
+                                        <input type="password" id="dcCvv" class="form-control" placeholder="456" maxlength="3" value="456">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Net Banking Panel -->
+                        <div class="payment-panel" id="panelNET_BANKING">
+                            <div class="bank-option-box">
+                                <h4><i class="fa-solid fa-building-columns"></i> Select Popular Bank</h4>
+                                <div class="popular-banks-grid">
+                                    <label class="bank-pill">
+                                        <input type="radio" name="selected_bank" value="HDFC" checked>
+                                        <span><i class="fa-solid fa-university"></i> HDFC Bank</span>
+                                    </label>
+                                    <label class="bank-pill">
+                                        <input type="radio" name="selected_bank" value="SBI">
+                                        <span><i class="fa-solid fa-university"></i> State Bank of India</span>
+                                    </label>
+                                    <label class="bank-pill">
+                                        <input type="radio" name="selected_bank" value="ICICI">
+                                        <span><i class="fa-solid fa-university"></i> ICICI Bank</span>
+                                    </label>
+                                    <label class="bank-pill">
+                                        <input type="radio" name="selected_bank" value="AXIS">
+                                        <span><i class="fa-solid fa-university"></i> Axis Bank</span>
+                                    </label>
+                                    <label class="bank-pill">
+                                        <input type="radio" name="selected_bank" value="KOTAK">
+                                        <span><i class="fa-solid fa-university"></i> Kotak Mahindra Bank</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Actions -->
+                    <div class="payment-submit-wrapper">
+                        <button type="button" class="btn btn-primary btn-block btn-xl pulse-button" id="payNowBtn" onclick="processPaymentSubmission()">
+                            <span id="payBtnText">Pay Now ₹{{ "%.2f"|format(pricing.total_amount) }}</span>
+                            <i class="fa-solid fa-lock" id="payBtnIcon"></i>
+                        </button>
+                        <p class="demo-notice-text">
+                            <i class="fa-solid fa-circle-info"></i> Demo Sandbox Mode: Clicking "Pay Now" simulates immediate successful transaction authorization and commits your booking.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Breakdown Sidebar -->
+            <div class="booking-sidebar-col">
+                <div class="order-summary-card">
+                    <div class="order-id-badge">
+                        <span>Order Reference:</span>
+                        <strong>{{ order_id }}</strong>
+                    </div>
+
+                    <h3 class="summary-title">{{ event.name }}</h3>
+
+                    <div class="summary-meta-item">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span>{{ event.event_date.strftime('%a, %d %b %Y') }} at {{ event.event_time.strftime('%I:%M %p') }}</span>
+                    </div>
+                    <div class="summary-meta-item">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span>{{ event.venue }}, {{ event.city }}</span>
+                    </div>
+
+                    <hr class="price-divider">
+
+                    <div class="price-breakdown-list">
+                        <div class="price-row">
+                            <span>Selected Seats ({{ attendees|length }})</span>
+                            <span class="price-val">
+                                {% for a in attendees %}{{ a.seat_number }}{% if not loop.last %}, {% endif %}{% endfor %}
+                            </span>
+                        </div>
+                        <div class="price-row">
+                            <span>Ticket Subtotal</span>
+                            <span class="price-val">₹{{ "%.2f"|format(pricing.subtotal) }}</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Convenience Fee (5%)</span>
+                            <span class="price-val">₹{{ "%.2f"|format(pricing.convenience_fee) }}</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Integrated GST (18%)</span>
+                            <span class="price-val">₹{{ "%.2f"|format(pricing.tax) }}</span>
+                        </div>
+                        <hr class="price-divider">
+                        <div class="price-row total-row">
+                            <strong>Total Payable</strong>
+                            <strong class="grand-total-amount">₹{{ "%.2f"|format(pricing.total_amount) }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/payment.js') }}"></script>
+{% endblock %}

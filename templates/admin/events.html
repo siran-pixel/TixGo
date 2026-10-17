@@ -1,0 +1,86 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Events Management | ShowSpot Admin{% endblock %}
+
+{% block content %}
+<div class="admin-page-container">
+    <div class="admin-page-header">
+        <div>
+            <h1><i class="fa-solid fa-calendar-days"></i> Event Management</h1>
+            <p>View, add, modify, and monitor events and dynamic seating layouts</p>
+        </div>
+        <a href="{{ url_for('admin.admin_add_event') }}" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Add New Event
+        </a>
+    </div>
+
+    <div class="admin-panel-card">
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Event Name</th>
+                        <th>Type</th>
+                        <th>Venue & City</th>
+                        <th>Date & Time</th>
+                        <th>Capacity</th>
+                        <th>Available</th>
+                        <th>Status</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ev in events %}
+                        <tr>
+                            <td>#{{ ev.id }}</td>
+                            <td>
+                                <strong>{{ ev.name }}</strong>
+                            </td>
+                            <td><span class="event-type-pill pill-{{ ev.event_type|lower }}">{{ ev.event_type }}</span></td>
+                            <td>{{ ev.venue }}, {{ ev.city }}</td>
+                            <td>{{ ev.event_date.strftime('%d %b %Y') }}<br><small class="text-muted">{{ ev.event_time.strftime('%I:%M %p') }}</small></td>
+                            <td>{{ ev.total_seats }}</td>
+                            <td>
+                                <strong class="{% if ev.available_seats_count > 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ ev.available_seats_count }}
+                                </strong>
+                            </td>
+                            <td>
+                                {% if ev.status == 'ACTIVE' %}
+                                    <span class="badge badge-success">ACTIVE</span>
+                                {% elif ev.status == 'CANCELLED' %}
+                                    <span class="badge badge-danger">CANCELLED</span>
+                                {% else %}
+                                    <span class="badge badge-secondary">{{ ev.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-right">
+                                <div class="table-actions-group">
+                                    <a href="{{ url_for('admin.admin_event_layout_designer', event_id=ev.id) }}" class="btn-icon" title="Configure Dynamic Seat Layout & Pricing">
+                                        <i class="fa-solid fa-shapes"></i>
+                                    </a>
+                                    <a href="{{ url_for('admin.admin_event_seats', event_id=ev.id) }}" class="btn-icon" title="Manage & Lock Seats for VIPs">
+                                        <i class="fa-solid fa-couch"></i>
+                                    </a>
+                                    <a href="{{ url_for('events.event_details', event_id=ev.id) }}" class="btn-icon" title="View Public Page" target="_blank">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('admin.admin_edit_event', event_id=ev.id) }}" class="btn-icon" title="Edit Event">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                    <form action="{{ url_for('admin.admin_delete_event', event_id=ev.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete or cancel this event?');">
+                                        <button type="submit" class="btn-icon btn-icon-danger" title="Delete / Cancel Event">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

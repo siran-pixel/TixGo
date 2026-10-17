@@ -1,0 +1,180 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Revenue Analytics | ShowSpot Admin{% endblock %}
+
+{% block content %}
+<div class="admin-page-container">
+    <div class="admin-page-header">
+        <div>
+            <h1><i class="fa-solid fa-chart-line"></i> Revenue & Sales Analytics</h1>
+            <p>Financial performance metrics, ticket velocity, and event-type revenue distribution</p>
+        </div>
+        <a href="{{ url_for('admin.admin_reports') }}" class="btn btn-primary">
+            <i class="fa-solid fa-file-excel"></i> Export Financial Reports
+        </a>
+    </div>
+
+    <!-- Revenue KPIs -->
+    <div class="metrics-grid">
+        <div class="metric-card metric-primary">
+            <div class="metric-icon-box"><i class="fa-solid fa-vault"></i></div>
+            <div class="metric-data">
+                <span class="metric-label">All-Time Revenue</span>
+                <strong class="metric-value">₹{{ "{:,.2f}".format(total_revenue) }}</strong>
+                <span class="metric-subtext">Gross Ticket Sales</span>
+            </div>
+        </div>
+
+        <div class="metric-card metric-success">
+            <div class="metric-icon-box"><i class="fa-solid fa-calendar-day"></i></div>
+            <div class="metric-data">
+                <span class="metric-label">Today's Revenue</span>
+                <strong class="metric-value">₹{{ "{:,.2f}".format(today_revenue) }}</strong>
+                <span class="metric-subtext">Sales Recorded Today</span>
+            </div>
+        </div>
+
+        <div class="metric-card metric-info">
+            <div class="metric-icon-box"><i class="fa-solid fa-calendar-check"></i></div>
+            <div class="metric-data">
+                <span class="metric-label">This Month's Revenue</span>
+                <strong class="metric-value">₹{{ "{:,.2f}".format(monthly_revenue) }}</strong>
+                <span class="metric-subtext">Current Month Total</span>
+            </div>
+        </div>
+
+        <div class="metric-card metric-danger">
+            <div class="metric-icon-box"><i class="fa-solid fa-ticket"></i></div>
+            <div class="metric-data">
+                <span class="metric-label">Tickets Sold</span>
+                <strong class="metric-value">{{ tickets_sold }}</strong>
+                <span class="metric-subtext">{{ tickets_available }} Available</span>
+            </div>
+        </div>
+
+        <div class="metric-card metric-warning">
+            <div class="metric-icon-box"><i class="fa-solid fa-ban"></i></div>
+            <div class="metric-data">
+                <span class="metric-label">Cancellations</span>
+                <strong class="metric-value">{{ cancellations }}</strong>
+                <span class="metric-subtext">Cancelled Bookings</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Charts Grid -->
+    <div class="admin-two-col-grid">
+        <!-- Canvas Chart: Category Revenue Visualizer -->
+        <div class="admin-panel-card">
+            <div class="panel-header">
+                <h3><i class="fa-solid fa-chart-pie"></i> Revenue by Event Category</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="categoryRevenueChart" width="400" height="260"></canvas>
+            </div>
+        </div>
+
+        <!-- Event Type Breakdown Table -->
+        <div class="admin-panel-card">
+            <div class="panel-header">
+                <h3><i class="fa-solid fa-list-check"></i> Category Breakdown</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Bookings</th>
+                            <th>Total Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if type_stats %}
+                            {% for st in type_stats %}
+                                <tr>
+                                    <td><span class="event-type-pill pill-{{ st.type|lower }}">{{ st.type }}</span></td>
+                                    <td>{{ st.bookings }}</td>
+                                    <td><strong>₹{{ "{:,.2f}".format(st.revenue) }}</strong></td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted" style="padding: 2rem;">No revenue recorded yet.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Lightweight vanilla canvas chart rendering for Category Revenue
+document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('categoryRevenueChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const statsData = [
+        {% for st in type_stats %}
+            { type: "{{ st.type }}", revenue: {{ st.revenue }} },
+        {% endfor %}
+    ];
+
+    if (statsData.length === 0 || statsData.every(d => d.revenue === 0)) {
+        ctx.fillStyle = "#888888";
+        ctx.font = "14px 'Plus Jakarta Sans', sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("No revenue transactions available to chart yet.", canvas.width / 2, canvas.height / 2);
+        return;
+    }
+
+    const colors = ["#f97316", "#22c55e", "#3b82f6", "#eab308", "#a855f7"];
+    let maxRev = Math.max(...statsData.map(d => d.revenue), 100);
+
+    const barWidth = 45;
+    const spacing = 35;
+    const startX = 50;
+    const bottomY = 200;
+    const maxHeight = 140;
+
+    statsData.forEach((item, index) => {
+        const x = startX + index * (barWidth + spacing);
+        const barHeight = (item.revenue / maxRev) * maxHeight;
+        const y = bottomY - barHeight;
+
+        // Bar gradient
+        const gradient = ctx.createLinearGradient(0, y, 0, bottomY);
+        gradient.addColorStop(0, colors[index % colors.length]);
+        gradient.addColorStop(1, "#ffedd5");
+
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.roundRect(x, y, barWidth, barHeight, [6, 6, 0, 0]);
+        ctx.fill();
+
+        // Label
+        ctx.fillStyle = "#334155";
+        ctx.font = "12px 'Plus Jakarta Sans', sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(item.type, x + barWidth / 2, bottomY + 20);
+
+        // Value on top
+        ctx.fillStyle = "#ea580c";
+        ctx.font = "bold 11px 'Plus Jakarta Sans', sans-serif";
+        ctx.fillText("₹" + (item.revenue >= 1000 ? (item.revenue / 1000).toFixed(1) + "k" : item.revenue), x + barWidth / 2, y - 8);
+    });
+
+    // Base line
+    ctx.strokeStyle = "#e2e8f0";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(30, bottomY);
+    ctx.lineTo(canvas.width - 20, bottomY);
+    ctx.stroke();
+});
+</script>
+{% endblock %}

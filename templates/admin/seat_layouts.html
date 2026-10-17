@@ -1,0 +1,174 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Seat Layout & Pricing Management | ShowSpot Admin{% endblock %}
+
+{% block content %}
+<div class="admin-page-container">
+    <div class="admin-page-header">
+        <div>
+            <h1><i class="fa-solid fa-shapes"></i> Dynamic Seat Layout & Pricing Management</h1>
+            <p>Design, customize, and manage sections, stands, rows, seat numbers, and ticket pricing across all events</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('admin.admin_add_event') }}" class="btn btn-primary">
+                <i class="fa-solid fa-calendar-plus"></i> Create New Event
+            </a>
+            <a href="{{ url_for('admin.admin_seats') }}" class="btn btn-outline">
+                <i class="fa-solid fa-couch"></i> VIP Seat Locking
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="admin-stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 1.5rem;">
+        <div class="admin-stat-card">
+            <div class="stat-card-icon" style="background: rgba(249, 115, 22, 0.12); color: #ea580c;">
+                <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            <div class="stat-card-info">
+                <span class="stat-card-label">Total Events</span>
+                <h3 class="stat-card-value">{{ events|length }}</h3>
+            </div>
+        </div>
+
+        <div class="admin-stat-card">
+            <div class="stat-card-icon" style="background: rgba(99, 102, 241, 0.12); color: #6366f1;">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <div class="stat-card-info">
+                <span class="stat-card-label">Total Sections / Stands</span>
+                <h3 class="stat-card-value">
+                    {{ events|map(attribute='sections')|map('list')|map('length')|sum }}
+                </h3>
+            </div>
+        </div>
+
+        <div class="admin-stat-card">
+            <div class="stat-card-icon" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
+                <i class="fa-solid fa-chair"></i>
+            </div>
+            <div class="stat-card-info">
+                <span class="stat-card-label">Total Capacity Configured</span>
+                <h3 class="stat-card-value">
+                    {{ events|map(attribute='total_seats')|sum|int }}
+                </h3>
+            </div>
+        </div>
+
+        <div class="admin-stat-card">
+            <div class="stat-card-icon" style="background: rgba(168, 85, 247, 0.12); color: #a855f7;">
+                <i class="fa-solid fa-ticket"></i>
+            </div>
+            <div class="stat-card-info">
+                <span class="stat-card-label">Available Seats</span>
+                <h3 class="stat-card-value">
+                    {{ events|map(attribute='available_seats_count')|sum|int }}
+                </h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Events Layout Management Table -->
+    <div class="admin-panel-card">
+        <div class="card-header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <div>
+                <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700;">
+                    <i class="fa-solid fa-list-check text-primary"></i> Event Seating Arrangements
+                </h3>
+                <p style="margin: 0.25rem 0 0 0; color: #64748b; font-size: 0.85rem;">
+                    Click <strong>Configure Layout</strong> to customize sections, stands, rows, and pricing for any event.
+                </p>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Event & Venue</th>
+                        <th>Category</th>
+                        <th>Configured Sections / Stands</th>
+                        <th>Capacity</th>
+                        <th>Price Range</th>
+                        <th>Status</th>
+                        <th class="text-right">Layout Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ev in events %}
+                        <tr>
+                            <td>#{{ ev.id }}</td>
+                            <td>
+                                <strong>{{ ev.name }}</strong>
+                                <div style="font-size: 0.8rem; color: #64748b;">
+                                    <i class="fa-solid fa-location-dot"></i> {{ ev.venue }}, {{ ev.city }}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="event-type-pill pill-{{ ev.event_type|lower }}">{{ ev.event_type }}</span>
+                            </td>
+                            <td>
+                                {% if ev.sections and ev.sections|length > 0 %}
+                                    <div style="display: flex; flex-wrap: wrap; gap: 0.35rem; max-width: 320px;">
+                                        {% for sec in ev.sections[:4] %}
+                                            <span style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.55rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 999px; font-size: 0.75rem; font-weight: 600; color: #334155;">
+                                                <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ sec.color or '#6366f1' }};"></span>
+                                                {{ sec.name }} (₹{{ sec.price|int }})
+                                            </span>
+                                        {% endfor %}
+                                        {% if ev.sections|length > 4 %}
+                                            <span style="font-size: 0.75rem; color: #64748b; align-self: center;">
+                                                +{{ ev.sections|length - 4 }} more
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span style="color: #94a3b8; font-size: 0.82rem; font-style: italic;">Default Preset Layout</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong style="font-size: 0.95rem;">{{ ev.total_seats }}</strong>
+                                <div style="font-size: 0.75rem; color: #10b981;">{{ ev.available_seats_count }} available</div>
+                            </td>
+                            <td>
+                                {% if ev.min_price > 0 %}
+                                    <strong style="color: #0f172a;">₹{{ ev.min_price|int }}</strong>
+                                    {% if ev.max_price > ev.min_price %}
+                                        <span style="color: #64748b; font-size: 0.8rem;">– ₹{{ ev.max_price|int }}</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span style="color: #94a3b8;">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if ev.status == 'ACTIVE' %}
+                                    <span class="badge badge-success">ACTIVE</span>
+                                {% elif ev.status == 'CANCELLED' %}
+                                    <span class="badge badge-danger">CANCELLED</span>
+                                {% else %}
+                                    <span class="badge badge-secondary">{{ ev.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-right">
+                                <div class="table-actions-group" style="justify-content: flex-end;">
+                                    <a href="{{ url_for('admin.admin_event_layout_designer', event_id=ev.id) }}" class="btn btn-sm btn-primary" title="Design Sections, Rows & Prices" style="gap: 0.4rem; padding: 0.35rem 0.75rem;">
+                                        <i class="fa-solid fa-shapes"></i>
+                                        <span>Configure Layout</span>
+                                    </a>
+                                    <a href="{{ url_for('admin.admin_event_seats', event_id=ev.id) }}" class="btn-icon" title="Lock/Unlock Seats for VIPs">
+                                        <i class="fa-solid fa-couch"></i>
+                                    </a>
+                                    <a href="{{ url_for('seats.seat_selection_view', event_id=ev.id) }}" class="btn-icon" title="Preview Public User View" target="_blank">
+                                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

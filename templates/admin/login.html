@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal Login | TixGo</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body class="admin-login-body">
+    <div class="auth-page-wrapper">
+        <div class="auth-card admin-auth-card">
+            <div class="auth-header">
+                <div class="auth-logo-badge admin-badge-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h2>TixGo Admin Portal</h2>
+                <p>Authorized access only. Sign in with your administrative credentials.</p>
+            </div>
+
+            <!-- Flash Alert -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="toast-item toast-{{ category }}" style="margin-bottom: 1.5rem; position: static;">
+                            <div class="toast-message">{{ message }}</div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('admin.admin_login') }}" method="POST" class="auth-form">
+                <div class="form-group">
+                    <label for="adminEmail"><i class="fa-regular fa-envelope"></i> Admin Email</label>
+                    <input type="email" id="adminEmail" name="email" class="form-control" placeholder="admin@example.com" required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label for="adminPassword"><i class="fa-solid fa-lock"></i> Password</label>
+                    <input type="password" id="adminPassword" name="password" class="form-control" placeholder="Enter admin password" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                    <i class="fa-solid fa-lock-open"></i>
+                    <span>Authenticate Admin</span>
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p><a href="{{ url_for('events.landing_page') }}"><i class="fa-solid fa-arrow-left"></i> Return to User Portal</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

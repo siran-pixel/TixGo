@@ -1,0 +1,206 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Organizer Section-Wise Reports | TixGo Admin{% endblock %}
+
+{% block content %}
+<div class="admin-page-container">
+    <div class="admin-page-header">
+        <div>
+            <h1><i class="fa-solid fa-layer-group"></i> Organizer Reports (Section-Wise Export)</h1>
+            <p>Generate organizer-safe attendee and ticketing CSV exports segmented by seating section or stand</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('admin.admin_date_wise_reports') }}" class="btn btn-outline">
+                <i class="fa-solid fa-calendar-check"></i> Date-Wise Reports
+            </a>
+        </div>
+    </div>
+
+    <div class="admin-two-col-grid">
+        <!-- Configuration & Download Actions -->
+        <div class="admin-panel-card">
+            <div class="panel-header">
+                <h3><i class="fa-solid fa-file-arrow-down"></i> Section-Wise Export Selector</h3>
+            </div>
+
+            <div style="padding: 1.5rem 0;">
+                <!-- Event Picker -->
+                <div class="form-group">
+                    <label for="orgEventSelect"><i class="fa-solid fa-calendar-days"></i> Step 1: Select Event</label>
+                    <select id="orgEventSelect" class="form-control" onchange="onEventChanged(this.value)">
+                        <option value="">-- Choose an Event --</option>
+                        {% for ev in events %}
+                            <option value="{{ ev.id }}">{{ ev.name }} ({{ ev.event_type }} - {{ ev.venue }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Dynamic Section / Stand Picker -->
+                <div class="form-group">
+                    <label for="orgSectionSelect"><i class="fa-solid fa-chair"></i> Step 2: Select Section or Stand</label>
+                    <select id="orgSectionSelect" class="form-control" disabled>
+                        <option value="">-- Select an event first --</option>
+                    </select>
+                    <small id="sectionHelpText" class="text-muted">Loads available seating sections and stands for the selected event.</small>
+                </div>
+
+                <!-- Optional unconfirmed bookings -->
+                <div class="form-group" style="margin-top: 0.5rem; margin-bottom: 1.25rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="includeUnconfirmed">
+                        <span>Include pending/unconfirmed reservations (Default: Confirmed only)</span>
+                    </label>
+                </div>
+
+                <!-- Export Action Buttons -->
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" id="btnDownloadSection" class="btn btn-primary btn-lg" onclick="downloadSingleSection()" disabled>
+                        <i class="fa-solid fa-file-csv"></i> Download Selected Section CSV
+                    </button>
+                    <button type="button" id="btnDownloadAllZip" class="btn btn-success btn-lg" style="background-color: #0d9488; border-color: #0d9488; color: white;" onclick="downloadAllSectionsZip()" disabled>
+                        <i class="fa-solid fa-file-zipper"></i> Download All Sections (ZIP Archive)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Privacy & Specification Card -->
+        <div class="admin-panel-card">
+            <div class="panel-header">
+                <h3><i class="fa-solid fa-shield-halved"></i> Organizer Data Privacy & Safety</h3>
+            </div>
+
+            <div style="padding: 1rem 0;">
+                <div style="padding: 0.85rem; background: #e8f5e9; border-left: 4px solid #2e7d32; border-radius: 4px; font-size: 0.85rem; color: #1b5e20; margin-bottom: 1.25rem;">
+                    <strong><i class="fa-solid fa-check-circle"></i> Organizer Safe:</strong> These exports are strictly curated for event coordinators, ground organizers, and gate check-in staff. Passwords, session tokens, and credit card credentials are completely excluded.
+                </div>
+
+                <h4 style="font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--admin-text-primary);">23 Organizer-Safe Report Columns:</h4>
+                <div class="columns-badge-cloud" style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.25rem;">
+                    <span class="badge badge-secondary">1. Booking ID</span>
+                    <span class="badge badge-secondary">2. Booking Date</span>
+                    <span class="badge badge-secondary">3. Booking Time</span>
+                    <span class="badge badge-secondary">4. Event Name</span>
+                    <span class="badge badge-secondary">5. Section / Stand</span>
+                    <span class="badge badge-secondary">6. Row Name</span>
+                    <span class="badge badge-secondary">7. Seat Number</span>
+                    <span class="badge badge-secondary">8. Attendee Name</span>
+                    <span class="badge badge-secondary">9. Mobile Number</span>
+                    <span class="badge badge-secondary">10. Email Address</span>
+                    <span class="badge badge-secondary">11. City</span>
+                    <span class="badge badge-secondary">12. Ticket Number</span>
+                    <span class="badge badge-secondary">13. Price Per Ticket</span>
+                    <span class="badge badge-secondary">14. Base Ticket Amount</span>
+                    <span class="badge badge-secondary">15. Discount Amount</span>
+                    <span class="badge badge-secondary">16. Extra Charges</span>
+                    <span class="badge badge-secondary">17. Total Payable Amount</span>
+                    <span class="badge badge-secondary">18. Actual Amount Paid</span>
+                    <span class="badge badge-secondary">19. Pending Amount</span>
+                    <span class="badge badge-secondary">20. Payment Method</span>
+                    <span class="badge badge-secondary">21. Payment Status</span>
+                    <span class="badge badge-secondary">22. Booking Status</span>
+                    <span class="badge badge-secondary">23. Ticket Status</span>
+                </div>
+
+                <h4 style="font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--admin-text-primary);">Section Summary at Bottom:</h4>
+                <ul style="padding-left: 1.25rem; font-size: 0.875rem; color: var(--admin-text-muted); line-height: 1.6;">
+                    <li><strong>Total Section Tickets Booked:</strong> Total admissions issued for this specific stand/section.</li>
+                    <li><strong>Total Section Base Amount:</strong> Ticket face value revenue generated by this section.</li>
+                    <li><strong>Total Unique Attendees:</strong> Verified head count of attendees.</li>
+                    <li><strong>Total Section Amount Paid:</strong> Reconciled collections for gate entry.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function onEventChanged(eventId) {
+    const secSelect = document.getElementById('orgSectionSelect');
+    const btnSection = document.getElementById('btnDownloadSection');
+    const btnZip = document.getElementById('btnDownloadAllZip');
+    const helpText = document.getElementById('sectionHelpText');
+
+    if (!eventId) {
+        secSelect.innerHTML = '<option value="">-- Select an event first --</option>';
+        secSelect.disabled = true;
+        btnSection.disabled = true;
+        btnZip.disabled = true;
+        helpText.textContent = 'Loads available seating sections and stands for the selected event.';
+        return;
+    }
+
+    secSelect.innerHTML = '<option value="">Loading sections...</option>';
+    secSelect.disabled = true;
+
+    try {
+        const res = await fetch(`/admin/api/events/${eventId}/sections`);
+        const data = await res.json();
+
+        if (data.success && data.sections && data.sections.length > 0) {
+            secSelect.innerHTML = '<option value="">-- Choose a Section / Stand --</option>';
+            data.sections.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.name;
+                opt.textContent = `${s.name} (${s.section_type || 'Section'} - ₹${s.price.toFixed(2)}${s.total_seats ? ' - ' + s.total_seats + ' seats' : ''})`;
+                secSelect.appendChild(opt);
+            });
+            secSelect.disabled = false;
+            btnZip.disabled = false;
+            helpText.textContent = `Found ${data.sections.length} seating section(s)/stand(s).`;
+        } else {
+            secSelect.innerHTML = '<option value="Standard">Standard (General Seating)</option>';
+            secSelect.disabled = false;
+            btnZip.disabled = false;
+            helpText.textContent = 'Using default standard seating section.';
+        }
+    } catch (err) {
+        console.error("Failed to load sections", err);
+        secSelect.innerHTML = '<option value="">Failed to load sections</option>';
+        secSelect.disabled = true;
+        btnZip.disabled = true;
+    }
+}
+
+document.getElementById('orgSectionSelect').addEventListener('change', function() {
+    const btnSection = document.getElementById('btnDownloadSection');
+    btnSection.disabled = !this.value;
+});
+
+function downloadSingleSection() {
+    const eventId = document.getElementById('orgEventSelect').value;
+    const section = document.getElementById('orgSectionSelect').value;
+    const includeUnconfirmed = document.getElementById('includeUnconfirmed').checked;
+
+    if (!eventId || !section) {
+        alert("Please select both an event and a section.");
+        return;
+    }
+
+    const params = new URLSearchParams({
+        event_id: eventId,
+        section: section,
+        include_unconfirmed: includeUnconfirmed
+    });
+    window.location.href = "{{ url_for('admin.admin_download_organizer_section_csv') }}?" + params.toString();
+}
+
+function downloadAllSectionsZip() {
+    const eventId = document.getElementById('orgEventSelect').value;
+    const includeUnconfirmed = document.getElementById('includeUnconfirmed').checked;
+
+    if (!eventId) {
+        alert("Please select an event.");
+        return;
+    }
+
+    const params = new URLSearchParams({
+        event_id: eventId,
+        include_unconfirmed: includeUnconfirmed
+    });
+    window.location.href = "{{ url_for('admin.admin_download_organizer_all_zip') }}?" + params.toString();
+}
+</script>
+{% endblock %}

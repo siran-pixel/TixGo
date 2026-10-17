@@ -1,0 +1,157 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Dashboard Overview | ShowSpot Admin{% endblock %}
+
+{% block content %}
+<div class="admin-page-container">
+    <div class="admin-page-header">
+        <div>
+            <h1><i class="fa-solid fa-gauge-high"></i> Dashboard Overview</h1>
+            <p>Real-time booking volume, revenue metrics, and system activity</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('admin.admin_add_event') }}" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i> Create New Event
+            </a>
+            <a href="{{ url_for('admin.admin_seats') }}" class="btn btn-outline">
+                <i class="fa-solid fa-couch"></i> Lock/Unlock Seats
+            </a>
+            <a href="{{ url_for('admin.admin_reports') }}" class="btn btn-outline">
+                <i class="fa-solid fa-file-export"></i> Export Reports
+            </a>
+        </div>
+    </div>
+
+    <!-- Metric KPI Cards Grid -->
+    <div class="metrics-grid">
+        <div class="metric-card metric-primary">
+            <div class="metric-icon-box"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+            <div class="metric-data">
+                <span class="metric-label">Total Revenue</span>
+                <strong class="metric-value">₹{{ "{:,.2f}".format(total_revenue) }}</strong>
+                <span class="metric-subtext"><i class="fa-solid fa-arrow-trend-up text-success"></i> Confirmed Bookings</span>
+            </div>
+        </div>
+
+        <div class="metric-card metric-danger">
+            <div class="metric-icon-box"><i class="fa-solid fa-ticket"></i></div>
+            <div class="metric-data">
+                <span class="metric-label">Tickets Sold</span>
+                <strong class="metric-value">{{ tickets_sold }}</strong>
+                <span class="metric-subtext">Issued QR Tickets</span>
+            </div>
+        </div>
+
+        <div class="metric-card metric-info">
+            <div class="metric-icon-box"><i class="fa-solid fa-receipt"></i></div>
+            <div class="metric-data">
+                <span class="metric-label">Total Bookings</span>
+                <strong class="metric-value">{{ total_bookings }}</strong>
+                <span class="metric-subtext">Transactions</span>
+            </div>
+        </div>
+
+        <div class="metric-card metric-warning">
+            <div class="metric-icon-box"><i class="fa-solid fa-calendar-star"></i></div>
+            <div class="metric-data">
+                <span class="metric-label">Active Events</span>
+                <strong class="metric-value">{{ total_events }}</strong>
+                <span class="metric-subtext">{{ upcoming_events_count }} Upcoming</span>
+            </div>
+        </div>
+
+        <div class="metric-card metric-success">
+            <div class="metric-icon-box"><i class="fa-solid fa-users"></i></div>
+            <div class="metric-data">
+                <span class="metric-label">Registered Users</span>
+                <strong class="metric-value">{{ total_users }}</strong>
+                <span class="metric-subtext">Verified Customer Profiles</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Split Grid: Recent Bookings & Upcoming Events -->
+    <div class="admin-two-col-grid">
+        <!-- Recent Bookings Table -->
+        <div class="admin-panel-card">
+            <div class="panel-header">
+                <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Bookings</h3>
+                <a href="{{ url_for('admin.admin_bookings') }}" class="view-all-link">View All Bookings &rarr;</a>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Ref ID</th>
+                            <th>Customer</th>
+                            <th>Event</th>
+                            <th>Seats</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if recent_bookings %}
+                            {% for b in recent_bookings %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('tickets.view_ticket', booking_reference=b.booking_reference) }}" target="_blank" class="table-ref-link">
+                                            {{ b.booking_reference }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <strong>{{ b.user.full_name }}</strong>
+                                        <small class="text-muted d-block">{{ b.user.email }}</small>
+                                    </td>
+                                    <td>{{ b.event.name[:25] }}...</td>
+                                    <td><span class="badge badge-secondary">{{ b.total_tickets }} Seats</span></td>
+                                    <td><strong>₹{{ "%.2f"|format(b.total_amount) }}</strong></td>
+                                    <td>
+                                        <span class="badge badge-success">{{ b.booking_status }}</span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No bookings recorded yet.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Upcoming Events List -->
+        <div class="admin-panel-card">
+            <div class="panel-header">
+                <h3><i class="fa-solid fa-calendar-day"></i> Upcoming Events</h3>
+                <a href="{{ url_for('admin.admin_events') }}" class="view-all-link">Manage Events &rarr;</a>
+            </div>
+
+            <div class="admin-events-list">
+                {% if upcoming_events %}
+                    {% for ev in upcoming_events %}
+                        <div class="event-summary-item">
+                            <div class="event-type-pill pill-{{ ev.event_type|lower }}">{{ ev.event_type }}</div>
+                            <div class="event-summary-body">
+                                <h4>{{ ev.name }}</h4>
+                                <div class="event-summary-meta">
+                                    <span><i class="fa-regular fa-calendar"></i> {{ ev.event_date.strftime('%d %b %Y') }} at {{ ev.event_time.strftime('%I:%M %p') }}</span>
+                                    <span><i class="fa-solid fa-location-dot"></i> {{ ev.venue }}, {{ ev.city }}</span>
+                                </div>
+                            </div>
+                            <div class="event-summary-stat">
+                                <strong>{{ ev.available_seats_count }}</strong>
+                                <small>Available</small>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-center text-muted" style="padding: 2rem;">No upcoming events scheduled.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

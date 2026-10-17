@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}E-Tickets - {{ booking.booking_reference }} | ShowSpot{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ticket.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="tickets-view-page">
+    <div class="section-container">
+        <!-- Ticket Actions Top Bar -->
+        <div class="ticket-actions-bar no-print">
+            <div class="booking-success-badge">
+                <i class="fa-solid fa-circle-check text-success"></i>
+                <div>
+                    <h2>Booking Confirmed!</h2>
+                    <span>Reference ID: <strong>{{ booking.booking_reference }}</strong></span>
+                </div>
+            </div>
+
+            <div class="actions-buttons-group">
+                <button type="button" class="btn btn-outline btn-action" onclick="window.print()">
+                    <i class="fa-solid fa-print"></i> Print Tickets
+                </button>
+                <button type="button" class="btn btn-outline btn-action" onclick="handleShareTicket('{{ booking.booking_reference }}', '{{ booking.event_name }}')">
+                    <i class="fa-solid fa-share-nodes"></i> Share
+                </button>
+                <a href="{{ url_for('booking.my_bookings') }}" class="btn btn-primary btn-action">
+                    <i class="fa-solid fa-receipt"></i> View All Bookings
+                </a>
+            </div>
+        </div>
+
+        <!-- Consolidated Multi-Attendee Tickets Container -->
+        <div class="consolidated-tickets-container" id="printableTicketArea">
+            <div class="tickets-page-header">
+                <div class="brand-watermark">
+                    <i class="fa-solid fa-ticket"></i> ShowSpot Official E-Ticket
+                </div>
+                <div class="booking-meta-pill">
+                    <span>Booked on: {{ booking.created_at }}</span>
+                    <span>Status: <strong class="text-success">{{ booking.booking_status }}</strong></span>
+                    <span>Total Paid: <strong>₹{{ "%.2f"|format(booking.total_amount) }}</strong></span>
+                </div>
+            </div>
+
+            <!-- List of Individual Tickets -->
+            <div class="tickets-cards-list">
+                {% for ticket in booking.tickets %}
+                    <div class="ticket-boarding-pass">
+                        <!-- Left Main Body -->
+                        <div class="pass-main-section">
+                            <div class="pass-event-header">
+                                <div class="pass-event-badge">{{ booking.event_type }}</div>
+                                <h3 class="pass-event-title">{{ booking.event_name }}</h3>
+                                <div class="pass-venue-meta">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span>{{ booking.venue }}, {{ booking.city }}</span>
+                                </div>
+                            </div>
+
+                            <div class="pass-meta-grid">
+                                <div class="pass-meta-cell">
+                                    <span class="cell-label">Date</span>
+                                    <strong class="cell-value">{{ booking.event_date }}</strong>
+                                </div>
+                                <div class="pass-meta-cell">
+                                    <span class="cell-label">Time</span>
+                                    <strong class="cell-value">{{ booking.event_time }}</strong>
+                                </div>
+                                <div class="pass-meta-cell">
+                                    <span class="cell-label">Seat Number</span>
+                                    <strong class="cell-value seat-number-highlight">{{ ticket.seat_number }}</strong>
+                                </div>
+                                <div class="pass-meta-cell">
+                                    <span class="cell-label">Tier / Section</span>
+                                    <strong class="cell-value">{{ ticket.section }}</strong>
+                                </div>
+                            </div>
+
+                            <div class="pass-attendee-strip">
+                                <div class="attendee-info-item">
+                                    <span class="cell-label">Attendee Name</span>
+                                    <strong>{{ ticket.attendee_name }} (Age: {{ ticket.attendee_age }})</strong>
+                                </div>
+                                <div class="attendee-info-item">
+                                    <span class="cell-label">Contact</span>
+                                    <span>{{ ticket.attendee_phone }} &bull; {{ ticket.attendee_city }}</span>
+                                </div>
+                                <div class="attendee-info-item">
+                                    <span class="cell-label">Ticket Price</span>
+                                    <span>₹{{ "%.2f"|format(ticket.price) }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Perforation Line -->
+                        <div class="pass-perforation-line">
+                            <div class="perforation-notch notch-top"></div>
+                            <div class="perforation-dashed"></div>
+                            <div class="perforation-notch notch-bottom"></div>
+                        </div>
+
+                        <!-- Right QR Stub -->
+                        <div class="pass-stub-section">
+                            <div class="stub-qr-wrapper">
+                                {% if ticket.qr_code_path %}
+                                    <img src="{{ ticket.qr_code_path }}" alt="Ticket QR Code for {{ ticket.ticket_number }}" class="ticket-qr-img">
+                                {% else %}
+                                    <div class="qr-placeholder"><i class="fa-solid fa-qrcode"></i></div>
+                                {% endif %}
+                            </div>
+                            <div class="stub-ticket-id">
+                                <span class="stub-label">TICKET NO:</span>
+                                <strong>{{ ticket.ticket_number }}</strong>
+                            </div>
+                            <div class="stub-security-note">
+                                <i class="fa-solid fa-shield-halved"></i> Scan at entry gate
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Ticket Footer Notes -->
+            <div class="ticket-notice-footer">
+                <p>
+                    <strong>Entry Instructions:</strong> Please present this official E-Ticket with the QR code at the entry gate of {{ booking.venue }}. 
+                    Entry is subject to terms and government-issued photo ID verification.
+                </p>
+                <div class="support-footer">
+                    <span>ShowSpot Customer Support &bull; Booking Ref: {{ booking.booking_reference }} &bull; Payment ID: {{ booking.transaction_id }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/ticket.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Attendee Details - {{ event.name }} | ShowSpot{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="booking-flow-page">
+    <!-- Stepper -->
+    <div class="stepper-container">
+        <div class="stepper-wrapper">
+            <div class="step-item completed"><div class="step-circle"><i class="fa-solid fa-check"></i></div><span class="step-label">Event</span></div>
+            <div class="step-line completed"></div>
+            <div class="step-item completed"><div class="step-circle"><i class="fa-solid fa-check"></i></div><span class="step-label">Seats</span></div>
+            <div class="step-line active"></div>
+            <div class="step-item active"><div class="step-circle">3</div><span class="step-label">Attendees</span></div>
+            <div class="step-line"></div>
+            <div class="step-item"><div class="step-circle">4</div><span class="step-label">Review</span></div>
+            <div class="step-line"></div>
+            <div class="step-item"><div class="step-circle">5</div><span class="step-label">Payment</span></div>
+            <div class="step-line"></div>
+            <div class="step-item"><div class="step-circle">6</div><span class="step-label">Ticket</span></div>
+        </div>
+    </div>
+
+    <div class="section-container">
+        <div class="booking-layout-grid">
+            <!-- Main Form Column -->
+            <div class="booking-main-col">
+                <div class="booking-card">
+                    <div class="booking-card-header">
+                        <h2><i class="fa-solid fa-users"></i> Attendee Information</h2>
+                        <p>Please enter details for each passenger/attendee. Each ticket will receive a unique QR code.</p>
+                    </div>
+
+                    <form action="{{ url_for('booking.attendee_details', event_id=event.id) }}" method="POST" id="attendeesForm">
+                        <div class="attendee-cards-list">
+                            {% for seat in seats %}
+                                <div class="attendee-seat-card" data-seat-id="{{ seat.id }}">
+                                    <div class="attendee-card-header">
+                                        <div class="seat-badge-header">
+                                            <span class="seat-number-tag"><i class="fa-solid fa-couch"></i> Seat {{ seat.seat_number }}</span>
+                                            <span class="seat-category-tag">{{ seat.category }} (₹{{ "%.0f"|format(seat.price) }})</span>
+                                        </div>
+                                        <span class="attendee-index-label">Attendee #{{ loop.index }}</span>
+                                    </div>
+
+                                    <div class="attendee-card-body">
+                                        <div class="form-row">
+                                            <div class="form-group col-two-thirds">
+                                                <label for="name_{{ seat.id }}"><i class="fa-regular fa-user"></i> Full Name *</label>
+                                                <input type="text" id="name_{{ seat.id }}" name="attendee_name_{{ seat.id }}" class="form-control" placeholder="e.g. Rahul Kumar" required value="{% if loop.first and current_user %}{{ current_user.full_name }}{% endif %}">
+                                            </div>
+                                            <div class="form-group col-one-third">
+                                                <label for="age_{{ seat.id }}"><i class="fa-solid fa-hashtag"></i> Age *</label>
+                                                <input type="number" id="age_{{ seat.id }}" name="attendee_age_{{ seat.id }}" class="form-control" placeholder="25" min="1" max="120" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-row">
+                                            <div class="form-group col-half">
+                                                <label for="phone_{{ seat.id }}"><i class="fa-solid fa-phone"></i> Phone Number *</label>
+                                                <input type="tel" id="phone_{{ seat.id }}" name="attendee_phone_{{ seat.id }}" class="form-control" placeholder="10-digit mobile" required value="{% if loop.first and current_user %}{{ current_user.phone }}{% endif %}">
+                                            </div>
+                                            <div class="form-group col-half">
+                                                <label for="city_{{ seat.id }}"><i class="fa-solid fa-city"></i> City *</label>
+                                                <input type="text" id="city_{{ seat.id }}" name="attendee_city_{{ seat.id }}" class="form-control" placeholder="e.g. Chennai" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-actions-bar">
+                            <a href="{{ url_for('seats.seat_selection_view', event_id=event.id) }}" class="btn btn-outline">
+                                <i class="fa-solid fa-arrow-left"></i> Change Seats
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitAttendeesBtn">
+                                <span>Proceed to Review</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Booking Summary Side Column -->
+            <div class="booking-sidebar-col">
+                <div class="order-summary-card">
+                    <h3 class="summary-title"><i class="fa-solid fa-receipt"></i> Booking Summary</h3>
+                    
+                    <div class="summary-event-info">
+                        <h4>{{ event.name }}</h4>
+                        <div class="summary-meta-item">
+                            <i class="fa-regular fa-calendar"></i>
+                            <span>{{ event.event_date.strftime('%a, %d %b %Y') }} at {{ event.event_time.strftime('%I:%M %p') }}</span>
+                        </div>
+                        <div class="summary-meta-item">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span>{{ event.venue }}, {{ event.city }}</span>
+                        </div>
+                    </div>
+
+                    <div class="summary-seats-breakdown">
+                        <span class="breakdown-label">Reserved Seats ({{ seats|length }}):</span>
+                        <div class="seats-pill-cloud">
+                            {% for seat in seats %}
+                                <span class="seat-pill">{{ seat.seat_number }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="lock-status-alert">
+                        <i class="fa-solid fa-clock pulse-icon"></i>
+                        <span>Seats locked for your checkout</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

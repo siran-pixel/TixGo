@@ -1,0 +1,127 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Add New Event | ShowSpot Admin{% endblock %}
+
+{% block content %}
+<div class="admin-page-container">
+    <div class="admin-page-header">
+        <div>
+            <h1><i class="fa-solid fa-calendar-plus"></i> Create New Event</h1>
+            <p>Define event details and automatically generate interactive seat maps</p>
+        </div>
+        <a href="{{ url_for('admin.admin_events') }}" class="btn btn-outline">
+            <i class="fa-solid fa-arrow-left"></i> Back to Events
+        </a>
+    </div>
+
+    <div class="admin-panel-card" style="max-width: 900px; margin: 0 auto;">
+        <form action="{{ url_for('admin.admin_add_event') }}" method="POST" class="admin-form" id="addEventForm">
+            <div class="form-group">
+                <label for="eventName"><i class="fa-solid fa-heading"></i> Event Name *</label>
+                <input type="text" id="eventName" name="name" class="form-control" placeholder="e.g. World Tour Live Concert" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="eventDescription"><i class="fa-solid fa-align-left"></i> Description *</label>
+                <textarea id="eventDescription" name="description" class="form-control" rows="4" placeholder="Enter a comprehensive overview of the event, artists, and schedule..." required></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-half">
+                    <label for="eventType"><i class="fa-solid fa-tag"></i> Event Type *</label>
+                    <select id="eventType" name="event_type" class="form-control" onchange="handleEventTypeChange(this.value)" required>
+                        <option value="Cricket" selected>Cricket Match (360° Circular Stadium - 2,500 seats)</option>
+                        <option value="Concert">Concert (1,050 seats: Elite, Gold, Silver)</option>
+                        <option value="General">General / Comedy Show (Max ₹1000 ticket price)</option>
+                    </select>
+                </div>
+
+                <div class="form-group col-half">
+                    <label for="bannerImage"><i class="fa-solid fa-image"></i> Banner Image URL</label>
+                    <input type="text" id="bannerImage" name="banner_image" class="form-control" placeholder="/static/images/event_cricket.jpg">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-half">
+                    <label for="venue"><i class="fa-solid fa-building"></i> Venue / Stadium *</label>
+                    <input type="text" id="venue" name="venue" class="form-control" placeholder="e.g. MA Chidambaram Stadium (Chepauk) / YMCA Grounds" required>
+                </div>
+
+                <div class="form-group col-half">
+                    <label for="city"><i class="fa-solid fa-city"></i> City *</label>
+                    <input type="text" id="city" name="city" class="form-control" placeholder="e.g. Chennai / Mumbai / Bengaluru" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-half">
+                    <label for="eventDate"><i class="fa-solid fa-calendar"></i> Event Date *</label>
+                    <input type="date" id="eventDate" name="event_date" class="form-control" required>
+                </div>
+
+                <div class="form-group col-half">
+                    <label for="eventTime"><i class="fa-solid fa-clock"></i> Event Time *</label>
+                    <input type="time" id="eventTime" name="event_time" class="form-control" required>
+                </div>
+            </div>
+
+            <!-- Seating Rules Information Card -->
+            <div class="seating-rules-notice" id="seatingRulesBox">
+                <div class="rules-notice-icon"><i class="fa-solid fa-circle-info"></i></div>
+                <div class="rules-notice-content">
+                    <h5>Automatic Seating Provisioning Rule</h5>
+                    <p id="seatingRuleText">
+                        <strong>Cricket Stadium:</strong> Automatically generates 2,500 seats across 10 stands (Stands A to I & Pavilion End) with Lower Stand (150 seats @ ₹2,000) and Upper Stand (100 seats @ ₹1,350) tiers.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Custom General Fields (Visible only for General Events) -->
+            <div class="form-row" id="customGeneralFields" style="display: none;">
+                <div class="form-group col-half">
+                    <label for="customCapacity"><i class="fa-solid fa-chair"></i> Total Capacity</label>
+                    <input type="number" id="customCapacity" name="custom_capacity" class="form-control" placeholder="e.g. 200" min="10" max="1000">
+                </div>
+
+                <div class="form-group col-half">
+                    <label for="customPrice"><i class="fa-solid fa-indian-rupee-sign"></i> Ticket Price (Max ₹1000) *</label>
+                    <input type="number" id="customPrice" name="custom_price" class="form-control" placeholder="e.g. 500" min="50" max="1000" step="10">
+                </div>
+            </div>
+
+            <div class="form-actions" style="display: flex; gap: 1rem; justify-content: flex-end; flex-wrap: wrap;">
+                <a href="{{ url_for('admin.admin_events') }}" class="btn btn-outline">Cancel</a>
+                <button type="submit" name="action" value="save" class="btn btn-outline" id="createEventPresetBtn">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Quick Create (Default Preset)</span>
+                </button>
+                <button type="submit" name="action" value="configure_layout" class="btn btn-primary btn-lg" id="createEventSubmitBtn">
+                    <i class="fa-solid fa-shapes"></i>
+                    <span>Create & Configure Seat Layout</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function handleEventTypeChange(type) {
+    const ruleText = document.getElementById('seatingRuleText');
+    const generalFields = document.getElementById('customGeneralFields');
+
+    if (type === 'Cricket') {
+        ruleText.innerHTML = '<strong>Cricket Stadium:</strong> Automatically generates 2,500 seats across 10 stands (Stands A to I & Pavilion End) with Lower Stand (150 seats @ ₹2,000) and Upper Stand (100 seats @ ₹1,350) tiers.';
+        generalFields.style.display = 'none';
+    } else if (type === 'Concert') {
+        ruleText.innerHTML = '<strong>Concert:</strong> Automatically generates 1,050 seats: Elite (50 seats @ ₹3000), Gold (200 seats @ ₹2000), and Silver (800 seats @ ₹1000).';
+        generalFields.style.display = 'none';
+    } else {
+        ruleText.innerHTML = '<strong>General / Comedy Show:</strong> Custom capacity with admin-configured ticket price (strictly enforced &le; ₹1000).';
+        generalFields.style.display = 'flex';
+    }
+}
+</script>
+{% endblock %}

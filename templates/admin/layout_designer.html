@@ -1,0 +1,979 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Layout Designer: {{ event.name }} | ShowSpot Admin{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/seats.css') }}">
+<style>
+.layout-designer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-bottom: 5rem;
+}
+
+.designer-hero-card {
+    background: linear-gradient(135deg, #ffffff 0%, #fff7ed 100%);
+    border: 1px solid #fed7aa;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.designer-event-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.35rem;
+}
+
+.designer-event-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.metrics-bar {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.metric-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.05em;
+}
+
+.metric-val {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #ea580c;
+    margin-top: 0.2rem;
+}
+
+.templates-toolbar {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.template-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.section-builder-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.85rem;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    transition: all 0.2s ease;
+}
+
+.section-builder-card:hover {
+    border-color: #cbd5e1;
+}
+
+.section-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.85rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.section-name-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #1e293b;
+}
+
+.section-color-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 1px #cbd5e1;
+}
+
+.rows-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.75rem;
+}
+
+.rows-table th {
+    background: #f8fafc;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #64748b;
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-radius: 0.35rem;
+}
+
+.rows-table td {
+    padding: 0.45rem 0.75rem;
+    vertical-align: middle;
+}
+
+.row-input-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-remove-row, .btn-remove-sec {
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    border-radius: 0.35rem;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.btn-remove-row:hover, .btn-remove-sec:hover {
+    background: #fca5a5;
+    color: #991b1b;
+}
+
+.preview-container {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.85rem;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.preview-grid-box {
+    background: #fafaf9;
+    border: 1px dashed #d6d3d1;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    min-height: 200px;
+    overflow-x: auto;
+}
+
+.preview-section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.preview-seat-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 26px;
+    padding: 0 4px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    border-radius: 4px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    margin: 2px;
+}
+
+.designer-sticky-actions {
+    position: sticky;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid #e2e8f0;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
+    border-radius: 0.75rem 0.75rem 0 0;
+    margin-top: 2rem;
+    z-index: 50;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-page-container layout-designer-container">
+    <!-- Hero / Event Details Header -->
+    <div class="designer-hero-card">
+        <div>
+            <div class="designer-event-title">
+                <i class="fa-solid fa-shapes text-primary"></i>
+                <span>{{ event.name }}</span>
+                <span class="event-type-pill pill-{{ event.event_type|lower }}">{{ event.event_type }}</span>
+            </div>
+            <div class="designer-event-meta">
+                <span><i class="fa-solid fa-location-dot"></i> {{ event.venue }}, {{ event.city }}</span>
+                <span><i class="fa-regular fa-calendar"></i> {{ event.event_date.strftime('%d %b %Y') }}</span>
+                <span><i class="fa-regular fa-clock"></i> {{ event.event_time.strftime('%I:%M %p') }}</span>
+                <span><i class="fa-solid fa-signal"></i> Status: <strong>{{ event.status }}</strong></span>
+            </div>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <a href="{{ url_for('admin.admin_seat_layouts') }}" class="btn btn-outline btn-sm">
+                <i class="fa-solid fa-arrow-left"></i> All Layouts
+            </a>
+            <a href="{{ url_for('seats.seat_selection_view', event_id=event.id) }}" target="_blank" class="btn btn-outline btn-sm">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Preview User View
+            </a>
+            <a href="{{ url_for('admin.admin_event_seats', event_id=event.id) }}" class="btn btn-outline btn-sm">
+                <i class="fa-solid fa-couch"></i> Lock/Unlock VIP Seats
+            </a>
+        </div>
+    </div>
+
+    {% if has_bookings %}
+    <div class="alert alert-warning" style="background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; padding: 1rem 1.25rem; border-radius: 0.75rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.25rem;"></i>
+        <div>
+            <strong>Active Bookings Detected:</strong> This event already has confirmed customer bookings. Layout modifications that overwrite or delete booked seats are disabled to protect customer tickets.
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Live Metrics Summary Bar -->
+    <div class="metrics-bar">
+        <div class="metric-item">
+            <span class="metric-label">Sections / Stands</span>
+            <span class="metric-val" id="metricTotalSections">0</span>
+        </div>
+        <div class="metric-item">
+            <span class="metric-label">Total Rows</span>
+            <span class="metric-val" id="metricTotalRows">0</span>
+        </div>
+        <div class="metric-item">
+            <span class="metric-label">Total Capacity</span>
+            <span class="metric-val" id="metricTotalCapacity">0 Seats</span>
+        </div>
+        <div class="metric-item">
+            <span class="metric-label">Price Range</span>
+            <span class="metric-val" id="metricPriceRange">₹0</span>
+        </div>
+        <div class="metric-item">
+            <span class="metric-label">Potential Gross</span>
+            <span class="metric-val" id="metricGrossRevenue" style="color: #10b981;">₹0</span>
+        </div>
+    </div>
+
+    <!-- Preset Templates Toolbar -->
+    <div class="templates-toolbar">
+        <div>
+            <strong style="font-size: 0.95rem; color: #1e293b;">
+                <i class="fa-solid fa-wand-magic-sparkles text-primary"></i> Load Layout Presets:
+            </strong>
+            <span style="font-size: 0.8rem; color: #64748b; margin-left: 0.5rem;">
+                Click any template to quickly scaffold standard seating layouts
+            </span>
+        </div>
+        <div class="template-buttons">
+            <button type="button" class="btn btn-outline btn-sm" onclick="loadConcertPreset()" {% if has_bookings %}disabled{% endif %}>
+                <i class="fa-solid fa-music"></i> Concert (Elite, Platinum, Silver)
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="loadCricketPreset()" {% if has_bookings %}disabled{% endif %}>
+                <i class="fa-solid fa-baseball-bat-ball"></i> Cricket (North, South, VIP Stands)
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="loadGeneralPreset()" {% if has_bookings %}disabled{% endif %}>
+                <i class="fa-solid fa-masks-theater"></i> General (Front VIP, General)
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="addNewSection()" {% if has_bookings %}disabled{% endif %}>
+                <i class="fa-solid fa-plus"></i> Add Section / Stand
+            </button>
+        </div>
+    </div>
+
+    <!-- Dynamic Sections Builder Form -->
+    <form id="layoutDesignerForm" onsubmit="handleFormSubmit(event)">
+        <div id="sectionsContainer">
+            <!-- Dynamically populated sections injected by JavaScript -->
+        </div>
+
+        <div style="text-align: center; margin: 1.5rem 0;">
+            <button type="button" class="btn btn-outline" onclick="addNewSection()" {% if has_bookings %}disabled{% endif %}>
+                <i class="fa-solid fa-plus"></i> Add Another Section or Stand
+            </button>
+        </div>
+
+        <!-- Live Visual Interactive Preview -->
+        <div class="preview-container">
+            <div class="preview-header">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: #0f172a;">
+                        <i class="fa-solid fa-eye text-primary"></i> Live Seating Layout Preview
+                    </h3>
+                    <p style="margin: 0.25rem 0 0 0; color: #64748b; font-size: 0.85rem;">
+                        Interactive representation of how sections, rows, and seats will render for customers
+                    </p>
+                </div>
+                <button type="button" class="btn btn-outline btn-sm" onclick="renderLivePreview()">
+                    <i class="fa-solid fa-arrows-rotate"></i> Refresh Preview
+                </button>
+            </div>
+
+            <!-- Direction Banner -->
+            <div class="stage-direction-container" style="margin-bottom: 1.25rem;">
+                {% if event.event_type == 'Cricket' %}
+                    <div class="concert-stage-banner" style="background: linear-gradient(135deg, #16a34a, #15803d);">
+                        <i class="fa-solid fa-baseball-bat-ball"></i> CENTRAL CRICKET PITCH / GROUND FACING <i class="fa-solid fa-baseball-bat-ball"></i>
+                    </div>
+                {% else %}
+                    <div class="concert-stage-banner">
+                        <i class="fa-solid fa-bolt"></i> MAIN STAGE / LIVE PERFORMANCE <i class="fa-solid fa-bolt"></i>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="preview-grid-box" id="previewGridBox">
+                <!-- Preview injected here -->
+            </div>
+        </div>
+
+        <!-- Sticky Bottom Actions Bar -->
+        <div class="designer-sticky-actions">
+            <div>
+                <a href="{{ url_for('admin.admin_seat_layouts') }}" class="btn btn-outline">Cancel</a>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <button type="button" class="btn btn-outline" onclick="renderLivePreview()">
+                    <i class="fa-solid fa-eye"></i> Update Preview
+                </button>
+                <button type="submit" name="action" value="save" class="btn btn-outline" id="btnSaveLayout" {% if has_bookings %}disabled{% endif %}>
+                    <i class="fa-solid fa-floppy-disk"></i> Save Layout & Seats
+                </button>
+                <button type="submit" name="action" value="publish" class="btn btn-primary btn-lg" id="btnPublishLayout" {% if has_bookings %}disabled{% endif %}>
+                    <i class="fa-solid fa-paper-plane"></i> Save & Publish Event
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Initial data from backend
+const INITIAL_SECTIONS = {{ initial_sections|tojson }};
+const EVENT_TYPE = {{ event.event_type|tojson }};
+const HAS_BOOKINGS = {{ has_bookings|tojson }};
+let sectionsData = JSON.parse(JSON.stringify(INITIAL_SECTIONS));
+
+// Color palette options
+const COLOR_PALETTE = [
+    { name: 'Purple', hex: '#a855f7' },
+    { name: 'Blue', hex: '#3b82f6' },
+    { name: 'Sky', hex: '#0ea5e9' },
+    { name: 'Amber', hex: '#f59e0b' },
+    { name: 'Orange', hex: '#f97316' },
+    { name: 'Green', hex: '#10b981' },
+    { name: 'Rose', hex: '#f43f5e' },
+    { name: 'Slate', hex: '#64748b' },
+];
+
+function initDesigner() {
+    renderSections();
+    updateMetrics();
+    renderLivePreview();
+}
+
+function renderSections() {
+    const container = document.getElementById('sectionsContainer');
+    container.innerHTML = '';
+
+    if (sectionsData.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 3rem 1rem; background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 0.75rem;">
+                <i class="fa-solid fa-shapes text-muted" style="font-size: 2.5rem; margin-bottom: 0.75rem;"></i>
+                <h4 style="margin: 0; color: #334155;">No sections configured yet</h4>
+                <p style="color: #64748b; font-size: 0.9rem; margin-top: 0.25rem;">Choose a preset template above or click "Add Section / Stand" to start.</p>
+            </div>
+        `;
+        return;
+    }
+
+    sectionsData.forEach((sec, secIdx) => {
+        const card = document.createElement('div');
+        card.className = 'section-builder-card';
+        card.id = `secCard_${secIdx}`;
+
+        const isStand = (sec.section_type || '').toLowerCase() === 'stand' || EVENT_TYPE.toLowerCase() === 'cricket';
+
+        let rowsHtml = '';
+        (sec.rows || []).forEach((row, rowIdx) => {
+            rowsHtml += `
+                <tr id="rowTr_${secIdx}_${rowIdx}">
+                    <td style="width: 35%;">
+                        <div class="row-input-group">
+                            <span style="font-weight: 700; color: #64748b; font-size: 0.8rem; width: 40px;">Row:</span>
+                            <input type="text" class="form-control form-control-sm" value="${escapeHtml(row.row_name)}" 
+                                   onchange="updateRowName(${secIdx}, ${rowIdx}, this.value)" 
+                                   placeholder="e.g. A" required ${HAS_BOOKINGS ? 'disabled' : ''}>
+                        </div>
+                    </td>
+                    <td style="width: 45%;">
+                        <div class="row-input-group">
+                            <span style="font-weight: 700; color: #64748b; font-size: 0.8rem; width: 45px;">Seats:</span>
+                            <input type="number" class="form-control form-control-sm" value="${parseInt(row.seat_count)}" min="1" max="500" 
+                                   onchange="updateRowSeatCount(${secIdx}, ${rowIdx}, this.value)" 
+                                   placeholder="e.g. 15" required ${HAS_BOOKINGS ? 'disabled' : ''}>
+                        </div>
+                    </td>
+                    <td style="text-align: right; width: 20%;">
+                        <button type="button" class="btn-remove-row" onclick="removeRow(${secIdx}, ${rowIdx})" title="Remove Row" ${HAS_BOOKINGS ? 'disabled' : ''}>
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        const totalSecSeats = (sec.rows || []).reduce((sum, r) => sum + parseInt(r.seat_count || 0), 0);
+        const secRevenue = totalSecSeats * parseFloat(sec.price || 0);
+
+        card.innerHTML = `
+            <div class="section-card-header">
+                <div class="section-name-pill">
+                    <span class="section-color-dot" style="background: ${sec.color || '#6366f1'};"></span>
+                    <span>${escapeHtml(sec.name || 'Untitled Section')}</span>
+                    <span class="badge badge-secondary" style="font-size: 0.7rem; font-weight: 600;">${sec.section_type || 'Section'}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 0.85rem; font-weight: 700; color: #1e293b;">
+                        ${totalSecSeats} Seats &bull; ₹${secRevenue.toLocaleString('en-IN')}
+                    </span>
+                    <button type="button" class="btn-remove-sec" onclick="removeSection(${secIdx})" title="Remove Entire Section" ${HAS_BOOKINGS ? 'disabled' : ''}>
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-half">
+                    <label style="font-size: 0.8rem; font-weight: 700; color: #475569;">
+                        ${isStand ? 'Stand Name' : 'Section Name'} *
+                    </label>
+                    <input type="text" class="form-control" value="${escapeHtml(sec.name || '')}" 
+                           oninput="updateSectionField(${secIdx}, 'name', this.value)" 
+                           placeholder="${isStand ? 'e.g. North Stand / VIP Stand' : 'e.g. Elite / Platinum'}" required ${HAS_BOOKINGS ? 'disabled' : ''}>
+                </div>
+
+                <div class="form-group col-half">
+                    <label style="font-size: 0.8rem; font-weight: 700; color: #475569;">
+                        Ticket Price (₹) *
+                    </label>
+                    <input type="number" class="form-control" value="${parseFloat(sec.price || 0)}" min="1" step="10" 
+                           oninput="updateSectionField(${secIdx}, 'price', this.value)" 
+                           placeholder="e.g. 1500" required ${HAS_BOOKINGS ? 'disabled' : ''}>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-half">
+                    <label style="font-size: 0.8rem; font-weight: 700; color: #475569;">Section Color</label>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="color" value="${sec.color || '#6366f1'}" 
+                               onchange="updateSectionField(${secIdx}, 'color', this.value)" 
+                               style="width: 40px; height: 38px; border: 1px solid #cbd5e1; border-radius: 0.35rem; cursor: pointer;" ${HAS_BOOKINGS ? 'disabled' : ''}>
+                        <div style="display: flex; gap: 0.3rem; flex-wrap: wrap;">
+                            ${COLOR_PALETTE.map(c => `
+                                <button type="button" onclick="updateSectionField(${secIdx}, 'color', '${c.hex}')" 
+                                        style="width: 22px; height: 22px; border-radius: 50%; background: ${c.hex}; border: 2px solid ${sec.color === c.hex ? '#0f172a' : '#ffffff'}; box-shadow: 0 0 0 1px #cbd5e1; cursor: pointer;" 
+                                        title="${c.name}" ${HAS_BOOKINGS ? 'disabled' : ''}></button>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group col-half">
+                    <label style="font-size: 0.8rem; font-weight: 700; color: #475569;">Description (Optional)</label>
+                    <input type="text" class="form-control" value="${escapeHtml(sec.description || '')}" 
+                           oninput="updateSectionField(${secIdx}, 'description', this.value)" 
+                           placeholder="e.g. Elevated central view with executive seating" ${HAS_BOOKINGS ? 'disabled' : ''}>
+                </div>
+            </div>
+
+            <!-- Rows Configuration Table -->
+            <div style="margin-top: 1rem; background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 0.5rem; padding: 0.75rem 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.85rem; font-weight: 700; color: #334155;">
+                        <i class="fa-solid fa-list-ol text-primary"></i> Rows & Seats Configuration (${sec.rows ? sec.rows.length : 0} rows)
+                    </span>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="addRow(${secIdx})" ${HAS_BOOKINGS ? 'disabled' : ''}>
+                        <i class="fa-solid fa-plus"></i> Add Row
+                    </button>
+                </div>
+
+                <table class="rows-table">
+                    <thead>
+                        <tr>
+                            <th>Row Label</th>
+                            <th>Number of Seats in Row</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                </table>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function updateSectionField(secIdx, field, value) {
+    if (!sectionsData[secIdx]) return;
+    sectionsData[secIdx][field] = value;
+    if (field === 'price' || field === 'name' || field === 'color') {
+        updateMetrics();
+        renderLivePreview();
+    }
+}
+
+function updateRowName(secIdx, rowIdx, value) {
+    if (sectionsData[secIdx] && sectionsData[secIdx].rows[rowIdx]) {
+        sectionsData[secIdx].rows[rowIdx].row_name = value.trim();
+        renderLivePreview();
+    }
+}
+
+function updateRowSeatCount(secIdx, rowIdx, value) {
+    const count = parseInt(value) || 0;
+    if (sectionsData[secIdx] && sectionsData[secIdx].rows[rowIdx]) {
+        sectionsData[secIdx].rows[rowIdx].seat_count = count;
+        updateMetrics();
+        renderLivePreview();
+    }
+}
+
+function addRow(secIdx) {
+    if (!sectionsData[secIdx]) return;
+    if (!sectionsData[secIdx].rows) sectionsData[secIdx].rows = [];
+    const rowIdx = sectionsData[secIdx].rows.length;
+    const nextLetter = String.fromCharCode(65 + (rowIdx % 26)) + (rowIdx >= 26 ? Math.floor(rowIdx/26) : '');
+    sectionsData[secIdx].rows.push({
+        row_name: nextLetter,
+        seat_count: 15,
+    });
+    renderSections();
+    updateMetrics();
+    renderLivePreview();
+}
+
+function removeRow(secIdx, rowIdx) {
+    if (!sectionsData[secIdx] || !sectionsData[secIdx].rows) return;
+    if (sectionsData[secIdx].rows.length <= 1) {
+        showToast('A section must have at least one row.', 'warning');
+        return;
+    }
+    sectionsData[secIdx].rows.splice(rowIdx, 1);
+    renderSections();
+    updateMetrics();
+    renderLivePreview();
+}
+
+function addNewSection() {
+    const secIdx = sectionsData.length;
+    const isCricket = EVENT_TYPE.toLowerCase() === 'cricket';
+    const color = COLOR_PALETTE[secIdx % COLOR_PALETTE.length].hex;
+    sectionsData.push({
+        name: isCricket ? `Stand ${String.fromCharCode(65 + secIdx)}` : `Section ${secIdx + 1}`,
+        section_type: isCricket ? 'Stand' : 'Section',
+        price: 1000.0,
+        color: color,
+        description: '',
+        rows: [
+            { row_name: 'A', seat_count: 15 },
+            { row_name: 'B', seat_count: 15 },
+        ],
+    });
+    renderSections();
+    updateMetrics();
+    renderLivePreview();
+    // Scroll to the newly added section
+    const newCard = document.getElementById(`secCard_${secIdx}`);
+    if (newCard) newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function removeSection(secIdx) {
+    if (sectionsData.length <= 1) {
+        showToast('At least one section or stand is required for an event.', 'warning');
+        return;
+    }
+    if (confirm(`Are you sure you want to delete section "${sectionsData[secIdx].name}"?`)) {
+        sectionsData.splice(secIdx, 1);
+        renderSections();
+        updateMetrics();
+        renderLivePreview();
+    }
+}
+
+// Preset Loaders
+function loadConcertPreset() {
+    if (confirm('Load Concert Layout Preset (Elite, Platinum, Silver)? This will replace current unsaved draft rows.')) {
+        sectionsData = [
+            {
+                name: "Elite",
+                section_type: "Section",
+                price: 2500.0,
+                color: "#a855f7",
+                description: "Stage-front VIP hospitality seating",
+                rows: [
+                    { row_name: "A", seat_count: 10 },
+                    { row_name: "B", seat_count: 10 },
+                    { row_name: "C", seat_count: 10 },
+                ]
+            },
+            {
+                name: "Platinum",
+                section_type: "Section",
+                price: 1500.0,
+                color: "#3b82f6",
+                description: "Prime central elevated view",
+                rows: [
+                    { row_name: "A", seat_count: 10 },
+                    { row_name: "B", seat_count: 15 },
+                    { row_name: "C", seat_count: 15 },
+                    { row_name: "D", seat_count: 20 },
+                ]
+            },
+            {
+                name: "Silver",
+                section_type: "Section",
+                price: 800.0,
+                color: "#94a3b8",
+                description: "Standard stadium tiers",
+                rows: [
+                    { row_name: "A", seat_count: 20 },
+                    { row_name: "B", seat_count: 20 },
+                    { row_name: "C", seat_count: 20 },
+                    { row_name: "D", seat_count: 25 },
+                    { row_name: "E", seat_count: 25 },
+                ]
+            }
+        ];
+        renderSections();
+        updateMetrics();
+        renderLivePreview();
+    }
+}
+
+function loadCricketPreset() {
+    if (confirm('Load Cricket Stadium Stand-Based Preset (North Stand, South Stand, VIP Stand)?')) {
+        sectionsData = [
+            {
+                name: "North Stand",
+                section_type: "Stand",
+                price: 500.0,
+                color: "#2563eb",
+                description: "Direct view of pitch and sightscreen",
+                rows: [
+                    { row_name: "A", seat_count: 50 },
+                    { row_name: "B", seat_count: 50 },
+                    { row_name: "C", seat_count: 60 },
+                ]
+            },
+            {
+                name: "South Stand",
+                section_type: "Stand",
+                price: 750.0,
+                color: "#0ea5e9",
+                description: "Pavilion End cheer squad terrace",
+                rows: [
+                    { row_name: "A", seat_count: 40 },
+                    { row_name: "B", seat_count: 50 },
+                    { row_name: "C", seat_count: 50 },
+                ]
+            },
+            {
+                name: "VIP Stand",
+                section_type: "Stand",
+                price: 2000.0,
+                color: "#eab308",
+                description: "Air-conditioned corporate hospitality box",
+                rows: [
+                    { row_name: "A", seat_count: 20 },
+                    { row_name: "B", seat_count: 20 },
+                ]
+            }
+        ];
+        renderSections();
+        updateMetrics();
+        renderLivePreview();
+    }
+}
+
+function loadGeneralPreset() {
+    if (confirm('Load General Show Preset (VIP Front, General Admission)?')) {
+        sectionsData = [
+            {
+                name: "VIP Front",
+                section_type: "Section",
+                price: 999.0,
+                color: "#f97316",
+                description: "Front rows close to artists",
+                rows: [
+                    { row_name: "A", seat_count: 15 },
+                    { row_name: "B", seat_count: 15 },
+                ]
+            },
+            {
+                name: "General Admission",
+                section_type: "Section",
+                price: 499.0,
+                color: "#64748b",
+                description: "Standard comfortable auditorium seating",
+                rows: [
+                    { row_name: "C", seat_count: 20 },
+                    { row_name: "D", seat_count: 20 },
+                    { row_name: "E", seat_count: 20 },
+                ]
+            }
+        ];
+        renderSections();
+        updateMetrics();
+        renderLivePreview();
+    }
+}
+
+function updateMetrics() {
+    let totalSections = sectionsData.length;
+    let totalRows = 0;
+    let totalCapacity = 0;
+    let minPrice = Infinity;
+    let maxPrice = 0;
+    let totalGross = 0;
+
+    sectionsData.forEach(sec => {
+        const p = parseFloat(sec.price || 0);
+        if (p < minPrice) minPrice = p;
+        if (p > maxPrice) maxPrice = p;
+
+        (sec.rows || []).forEach(r => {
+            totalRows++;
+            const sc = parseInt(r.seat_count || 0);
+            totalCapacity += sc;
+            totalGross += (sc * p);
+        });
+    });
+
+    document.getElementById('metricTotalSections').textContent = totalSections;
+    document.getElementById('metricTotalRows').textContent = totalRows;
+    document.getElementById('metricTotalCapacity').textContent = `${totalCapacity.toLocaleString('en-IN')} Seats`;
+    
+    if (minPrice === Infinity) minPrice = 0;
+    if (minPrice === maxPrice) {
+        document.getElementById('metricPriceRange').textContent = `₹${minPrice.toLocaleString('en-IN')}`;
+    } else {
+        document.getElementById('metricPriceRange').textContent = `₹${minPrice.toLocaleString('en-IN')} - ₹${maxPrice.toLocaleString('en-IN')}`;
+    }
+    document.getElementById('metricGrossRevenue').textContent = `₹${totalGross.toLocaleString('en-IN')}`;
+}
+
+function renderLivePreview() {
+    const previewBox = document.getElementById('previewGridBox');
+    previewBox.innerHTML = '';
+
+    if (sectionsData.length === 0) {
+        previewBox.innerHTML = '<p class="text-muted" style="text-align: center; margin: 2rem 0;">No sections to preview.</p>';
+        return;
+    }
+
+    const isMultiSec = sectionsData.length > 1;
+
+    sectionsData.forEach((sec, sIdx) => {
+        const secBlock = document.createElement('div');
+        secBlock.className = 'seat-section-block';
+        secBlock.style.borderLeft = `4px solid ${sec.color || '#6366f1'}`;
+        secBlock.style.paddingLeft = '1rem';
+        secBlock.style.marginBottom = '1.5rem';
+
+        const price = parseFloat(sec.price || 0);
+        const secCode = (sec.name || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 6) || `SEC${sIdx+1}`;
+
+        secBlock.innerHTML = `
+            <div class="preview-section-title" style="color: ${sec.color || '#1e293b'};">
+                <span style="width: 10px; height: 10px; border-radius: 50%; background: ${sec.color || '#6366f1'};"></span>
+                <span>${escapeHtml(sec.name)} &bull; ₹${price.toLocaleString('en-IN')} / ticket</span>
+                <span class="badge badge-secondary" style="font-size: 0.7rem;">${sec.section_type || 'Section'}</span>
+            </div>
+        `;
+
+        (sec.rows || []).forEach(row => {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'seat-row';
+            rowDiv.style.display = 'flex';
+            rowDiv.style.alignItems = 'center';
+            rowDiv.style.gap = '0.35rem';
+            rowDiv.style.marginBottom = '0.35rem';
+            rowDiv.style.overflowX = 'auto';
+
+            const labelSpan = document.createElement('span');
+            labelSpan.className = 'row-label';
+            labelSpan.textContent = row.row_name;
+            labelSpan.style.width = '30px';
+            labelSpan.style.fontWeight = '700';
+            labelSpan.style.fontSize = '0.75rem';
+            labelSpan.style.color = '#64748b';
+            rowDiv.appendChild(labelSpan);
+
+            const count = parseInt(row.seat_count || 0);
+            for (let i = 1; i <= count; i++) {
+                const chip = document.createElement('span');
+                chip.className = 'preview-seat-chip';
+                const seatId = isMultiSec ? `${secCode}-${row.row_name}${i}` : `${row.row_name}${i}`;
+                chip.textContent = i;
+                chip.title = `${seatId} (${sec.name} • ₹${price})`;
+                chip.style.borderTop = `2px solid ${sec.color || '#6366f1'}`;
+                rowDiv.appendChild(chip);
+            }
+
+            secBlock.appendChild(rowDiv);
+        });
+
+        previewBox.appendChild(secBlock);
+    });
+}
+
+async function handleFormSubmit(event) {
+    event.preventDefault();
+    const submitter = event.submitter;
+    const action = submitter ? submitter.value : 'save';
+    const isPublish = action === 'publish';
+
+    if (sectionsData.length === 0) {
+        showToast('Please add at least one section with rows.', 'danger');
+        return;
+    }
+
+    // Validate that every section has at least one row and positive price
+    for (const sec of sectionsData) {
+        if (!sec.name.trim()) {
+            showToast('All sections must have a valid name.', 'danger');
+            return;
+        }
+        if (parseFloat(sec.price) <= 0) {
+            showToast(`Price for section "${sec.name}" must be greater than ₹0.`, 'danger');
+            return;
+        }
+        if (!sec.rows || sec.rows.length === 0) {
+            showToast(`Section "${sec.name}" must have at least one row.`, 'danger');
+            return;
+        }
+        for (const r of sec.rows) {
+            if (!r.row_name.trim()) {
+                showToast(`Row in section "${sec.name}" is missing a label.`, 'danger');
+                return;
+            }
+            if (parseInt(r.seat_count) <= 0) {
+                showToast(`Row "${r.row_name}" in section "${sec.name}" must have at least 1 seat.`, 'danger');
+                return;
+            }
+        }
+    }
+
+    const saveBtn = document.getElementById('btnSaveLayout');
+    const pubBtn = document.getElementById('btnPublishLayout');
+    if (saveBtn) saveBtn.disabled = true;
+    if (pubBtn) pubBtn.disabled = true;
+
+    try {
+        const response = await fetch("{{ url_for('admin.admin_event_layout_designer', event_id=event.id) }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                sections: sectionsData,
+                publish: isPublish,
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            showToast(data.message, 'success');
+            setTimeout(() => {
+                window.location.href = "{{ url_for('admin.admin_seat_layouts') }}";
+            }, 1000);
+        } else {
+            showToast(data.message || 'Error saving layout configuration.', 'danger');
+            if (saveBtn) saveBtn.disabled = false;
+            if (pubBtn) pubBtn.disabled = false;
+        }
+    } catch (err) {
+        showToast('Network error while saving layout configuration.', 'danger');
+        if (saveBtn) saveBtn.disabled = false;
+        if (pubBtn) pubBtn.disabled = false;
+    }
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return text.toString()
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+document.addEventListener('DOMContentLoaded', initDesigner);
+</script>
+{% endblock %}

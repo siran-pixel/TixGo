@@ -1,0 +1,59 @@
+{% extends "admin/base.html" %}
+
+{% block title %}User Directory | ShowSpot Admin{% endblock %}
+
+{% block content %}
+<div class="admin-page-container">
+    <div class="admin-page-header">
+        <div>
+            <h1><i class="fa-solid fa-users"></i> Registered Users Directory</h1>
+            <p>View verified customer accounts, contact details, and booking participation</p>
+        </div>
+    </div>
+
+    <div class="admin-panel-card">
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Full Name</th>
+                        <th>Email Address</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Total Bookings</th>
+                        <th>Registered Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if users %}
+                        {% for u in users %}
+                            <tr>
+                                <td>#{{ u.id }}</td>
+                                <td><strong>{{ u.full_name }}</strong></td>
+                                <td>{{ u.email }}</td>
+                                <td>{{ u.phone }}</td>
+                                <td>
+                                    {% if u.is_verified %}
+                                        <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Verified</span>
+                                    {% else %}
+                                        <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> Unverified</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge badge-secondary">{{ u.bookings|length }} Bookings</span>
+                                </td>
+                                <td>{{ u.created_at.strftime('%d %b %Y, %H:%M') if u.created_at else 'N/A' }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted" style="padding: 2rem;">No registered users yet.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

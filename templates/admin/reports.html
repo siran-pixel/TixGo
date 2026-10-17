@@ -1,0 +1,109 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Export Data Reports | ShowSpot Admin{% endblock %}
+
+{% block content %}
+<div class="admin-page-container">
+    <div class="admin-page-header">
+        <div>
+            <h1><i class="fa-solid fa-file-export"></i> Data & Financial Reports Export</h1>
+            <p>Generate and export comprehensive booking records, attendees, seats, and payments in CSV and Excel formats</p>
+        </div>
+    </div>
+
+    <div class="admin-two-col-grid">
+        <!-- Export Configuration Card -->
+        <div class="admin-panel-card">
+            <div class="panel-header">
+                <h3><i class="fa-solid fa-filter"></i> Filter & Generate Export</h3>
+            </div>
+
+            <form id="exportForm" class="admin-form" style="padding: 1.5rem 0;">
+                <div class="form-group">
+                    <label for="exportEventId"><i class="fa-solid fa-calendar-days"></i> Select Event</label>
+                    <select id="exportEventId" name="event_id" class="form-control">
+                        <option value="">All Events</option>
+                        {% for ev in events %}
+                            <option value="{{ ev.id }}">{{ ev.name }} ({{ ev.city }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-half">
+                        <label for="exportStartDate"><i class="fa-regular fa-calendar"></i> From Date</label>
+                        <input type="date" id="exportStartDate" name="start_date" class="form-control">
+                    </div>
+                    <div class="form-group col-half">
+                        <label for="exportEndDate"><i class="fa-regular fa-calendar"></i> To Date</label>
+                        <input type="date" id="exportEndDate" name="end_date" class="form-control">
+                    </div>
+                </div>
+
+                <div class="export-buttons-group" style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-primary btn-lg" style="flex: 1;" onclick="triggerExport('csv')">
+                        <i class="fa-solid fa-file-csv"></i>
+                        <span>Download CSV</span>
+                    </button>
+                    <button type="button" class="btn btn-success btn-lg" style="flex: 1; background-color: #198754; border-color: #198754; color: white;" onclick="triggerExport('excel')">
+                        <i class="fa-solid fa-file-excel"></i>
+                        <span>Download Excel (XLSX)</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Export Schema Information Card -->
+        <div class="admin-panel-card">
+            <div class="panel-header">
+                <h3><i class="fa-solid fa-table-list"></i> Included Report Columns (19 Fields)</h3>
+            </div>
+            
+            <div class="schema-info-list" style="padding: 1rem 0;">
+                <p class="text-muted" style="margin-bottom: 1rem;">The exported file aggregates relational data across Bookings, Attendees, Seats, and Payment transactions:</p>
+                <div class="columns-badge-cloud" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    <span class="badge badge-secondary">Booking ID</span>
+                    <span class="badge badge-secondary">User Name</span>
+                    <span class="badge badge-secondary">User Email</span>
+                    <span class="badge badge-secondary">Event</span>
+                    <span class="badge badge-secondary">Venue</span>
+                    <span class="badge badge-secondary">Date</span>
+                    <span class="badge badge-secondary">Time</span>
+                    <span class="badge badge-secondary">Ticket ID</span>
+                    <span class="badge badge-secondary">Seat Number</span>
+                    <span class="badge badge-secondary">Category</span>
+                    <span class="badge badge-secondary">Attendee Name</span>
+                    <span class="badge badge-secondary">Age</span>
+                    <span class="badge badge-secondary">Phone</span>
+                    <span class="badge badge-secondary">City</span>
+                    <span class="badge badge-secondary">Ticket Price</span>
+                    <span class="badge badge-secondary">Payment Amount</span>
+                    <span class="badge badge-secondary">Payment Status</span>
+                    <span class="badge badge-secondary">Booking Status</span>
+                    <span class="badge badge-secondary">Booking Date</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function triggerExport(format) {
+    const eventId = document.getElementById('exportEventId').value;
+    const startDate = document.getElementById('exportStartDate').value;
+    const endDate = document.getElementById('exportEndDate').value;
+
+    const params = new URLSearchParams();
+    if (eventId) params.append('event_id', eventId);
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+
+    const baseUrl = format === 'csv' ? '{{ url_for("admin.api_export_csv") }}' : '{{ url_for("admin.api_export_excel") }}';
+    const finalUrl = baseUrl + (params.toString() ? '?' + params.toString() : '');
+    
+    window.location.href = finalUrl;
+}
+</script>
+{% endblock %}

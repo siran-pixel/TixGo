@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Portal | TixGo{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="admin-body">
+    <!-- Admin Top Navbar -->
+    <header class="admin-top-nav">
+        <div class="admin-nav-left">
+            <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Admin Sidebar">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <a href="{{ url_for('admin.admin_dashboard') }}" class="admin-brand">
+                <span class="logo-icon"><i class="fa-solid fa-shield-halved"></i></span>
+                <span class="admin-brand-text">TixGo <span class="badge badge-danger">Admin</span></span>
+            </a>
+        </div>
+
+        <div class="admin-nav-right">
+            <a href="{{ url_for('events.landing_page') }}" class="btn btn-outline btn-sm user-site-link" target="_blank">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> View Live Site
+            </a>
+            <div class="admin-user-pill">
+                <i class="fa-solid fa-circle-user"></i>
+                <span>{{ current_admin.email if current_admin else 'Administrator' }}</span>
+            </div>
+            <a href="{{ url_for('admin.admin_logout') }}" class="admin-logout-btn" title="Sign Out">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </a>
+        </div>
+    </header>
+
+    <div class="admin-layout">
+        <!-- Admin Sidebar -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('admin.admin_dashboard') }}" class="sidebar-link {% if request.endpoint == 'admin.admin_dashboard' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('admin.admin_events') }}" class="sidebar-link {% if request.endpoint in ('admin.admin_events', 'admin.admin_add_event', 'admin.admin_edit_event') %}active{% endif %}">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>Events Management</span>
+                </a>
+                <a href="{{ url_for('admin.admin_seat_layouts') }}" class="sidebar-link {% if request.endpoint in ('admin.admin_seat_layouts', 'admin.admin_event_layout_designer') %}active{% endif %}">
+                    <i class="fa-solid fa-shapes"></i>
+                    <span>Seat Layout Management</span>
+                </a>
+                <a href="{{ url_for('admin.admin_seats') }}" class="sidebar-link {% if request.endpoint in ('admin.admin_seats', 'admin.admin_event_seats') %}active{% endif %}">
+                    <i class="fa-solid fa-couch"></i>
+                    <span>Seat Locking & VIPs</span>
+                </a>
+                <a href="{{ url_for('admin.admin_bookings') }}" class="sidebar-link {% if request.endpoint == 'admin.admin_bookings' %}active{% endif %}">
+                    <i class="fa-solid fa-ticket"></i>
+                    <span>Bookings Monitor</span>
+                </a>
+                <a href="{{ url_for('admin.admin_users') }}" class="sidebar-link {% if request.endpoint == 'admin.admin_users' %}active{% endif %}">
+                    <i class="fa-solid fa-users"></i>
+                    <span>User Directory</span>
+                </a>
+                <a href="{{ url_for('admin.admin_revenue') }}" class="sidebar-link {% if request.endpoint == 'admin.admin_revenue' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Revenue Analytics</span>
+                </a>
+                <a href="{{ url_for('admin.admin_date_wise_reports') }}" class="sidebar-link {% if request.endpoint == 'admin.admin_date_wise_reports' %}active{% endif %}">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span>Date-Wise Booking Reports</span>
+                </a>
+                <a href="{{ url_for('admin.admin_organizer_reports') }}" class="sidebar-link {% if request.endpoint == 'admin.admin_organizer_reports' %}active{% endif %}">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>Organizer Reports</span>
+                </a>
+                <a href="{{ url_for('admin.admin_event_date_management') }}" class="sidebar-link {% if request.endpoint == 'admin.admin_event_date_management' %}active{% endif %}">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>Event Dates (Nov 2026)</span>
+                </a>
+                <a href="{{ url_for('admin.admin_reports') }}" class="sidebar-link {% if request.endpoint == 'admin.admin_reports' %}active{% endif %}">
+                    <i class="fa-solid fa-file-export"></i>
+                    <span>Export CSV / Excel</span>
+                </a>
+                <hr class="sidebar-divider">
+                <a href="{{ url_for('admin.admin_logout') }}" class="sidebar-link text-danger">
+                    <i class="fa-solid fa-power-off"></i>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Admin Main Body Area -->
+        <main class="admin-main">
+            <!-- Flash Message Toasts -->
+            <div class="toast-container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="toast-item toast-{{ category }}">
+                                <div class="toast-icon"><i class="fa-solid fa-circle-info"></i></div>
+                                <div class="toast-message">{{ message }}</div>
+                                <button class="toast-close" onclick="this.parentElement.remove();">&times;</button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Admin JavaScript -->
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

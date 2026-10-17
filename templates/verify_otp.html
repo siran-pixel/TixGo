@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Verify OTP Code | ShowSpot{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-page-wrapper">
+    <div class="auth-card otp-card">
+        <div class="auth-header">
+            <div class="auth-logo-badge pulse-badge">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h2>Verify Your Email</h2>
+            <p>
+                We have sent a 6-digit verification code to<br>
+                <strong class="highlight-email">{{ email }}</strong>
+            </p>
+        {% if demo_otp %}
+        <div style="background: rgba(229, 9, 20, 0.1); border: 1px dashed var(--primary-color); border-radius: 8px; padding: 12px; margin-bottom: 20px; text-align: center;">
+            <div style="font-size: 0.85rem; color: #aaa; margin-bottom: 4px;">
+                <i class="fa-solid fa-flask" style="color: var(--primary-color);"></i> <strong>Demo / Local Test Mode</strong>
+            </div>
+            <div style="font-size: 1.15rem; font-weight: 700; color: #ffffff; letter-spacing: 3px; font-family: monospace;" id="demoOtpCodeDisplay">
+                {{ demo_otp }}
+            </div>
+            <button type="button" class="btn btn-outline" style="font-size: 0.8rem; padding: 4px 12px; margin-top: 8px; border-radius: 20px;" onclick="autofillOtp('{{ demo_otp }}')">
+                <i class="fa-solid fa-bolt"></i> Click to Auto-fill
+            </button>
+        </div>
+        {% endif %}
+
+        <form action="{{ url_for('auth.verify_otp') }}" method="POST" class="auth-form" id="otpForm">
+            <input type="hidden" name="email" id="otpEmailInput" value="{{ email }}">
+            <input type="hidden" name="purpose" id="otpPurposeInput" value="{{ purpose }}">
+            <input type="hidden" name="otp" id="combinedOtpInput">
+
+            <!-- 6-Box OTP Input -->
+            <div class="otp-inputs-container" id="otpInputsContainer">
+                <input type="text" name="otp_digit_1" maxlength="1" class="otp-digit" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code" autofocus>
+                <input type="text" name="otp_digit_2" maxlength="1" class="otp-digit" inputmode="numeric" pattern="[0-9]">
+                <input type="text" name="otp_digit_3" maxlength="1" class="otp-digit" inputmode="numeric" pattern="[0-9]">
+                <input type="text" name="otp_digit_4" maxlength="1" class="otp-digit" inputmode="numeric" pattern="[0-9]">
+                <input type="text" name="otp_digit_5" maxlength="1" class="otp-digit" inputmode="numeric" pattern="[0-9]">
+                <input type="text" name="otp_digit_6" maxlength="1" class="otp-digit" inputmode="numeric" pattern="[0-9]">
+            </div>
+
+            <!-- Countdown Timer -->
+            <div class="otp-timer-box">
+                <i class="fa-regular fa-clock"></i>
+                <span>Code expires in: </span>
+                <span class="timer-digits" id="otpTimer">05:00</span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="verifyOtpBtn">
+                <span>Verify & Proceed</span>
+                <i class="fa-solid fa-circle-check"></i>
+            </button>
+        </form>
+
+        <div class="resend-otp-wrapper">
+            <p>Didn't receive the code?</p>
+            <button type="button" class="btn btn-link" id="resendOtpBtn" disabled onclick="handleResendOtp()">
+                <i class="fa-solid fa-rotate-right"></i> Resend OTP Code
+            </button>
+        </div>
+
+        <div class="auth-footer">
+            <p><a href="{{ url_for('auth.signup') }}" class="back-link"><i class="fa-solid fa-arrow-left"></i> Change Email or Go Back</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,189 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Bookings Monitor | ShowSpot Admin{% endblock %}
+
+{% block content %}
+<div class="admin-page-container">
+    <div class="admin-page-header">
+        <div>
+            <h1><i class="fa-solid fa-ticket"></i> Bookings Monitor</h1>
+            <p>Track all customer bookings, attendees, ticket numbers, and payments</p>
+        </div>
+        <a href="{{ url_for('admin.api_export_csv') }}" class="btn btn-outline">
+            <i class="fa-solid fa-download"></i> Quick CSV Export
+        </a>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="admin-filter-bar">
+        <form action="{{ url_for('admin.admin_bookings') }}" method="GET" class="filter-form">
+            <div class="filter-input-group">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="search" placeholder="Search by booking ref, customer name, email, or event..." value="{{ search_query }}">
+            </div>
+            <select name="status" class="filter-select">
+                <option value="">All Statuses</option>
+                <option value="CONFIRMED" {% if status_filter == 'CONFIRMED' %}selected{% endif %}>CONFIRMED</option>
+                <option value="CANCELLED" {% if status_filter == 'CANCELLED' %}selected{% endif %}>CANCELLED</option>
+                <option value="PENDING" {% if status_filter == 'PENDING' %}selected{% endif %}>PENDING</option>
+            </select>
+            <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+            {% if search_query or status_filter %}
+                <a href="{{ url_for('admin.admin_bookings') }}" class="btn btn-outline btn-sm">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Bookings Table -->
+    <div class="admin-panel-card">
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Booking Ref</th>
+                        <th>Customer</th>
+                        <th>Event & Date</th>
+                        <th>Seats</th>
+                        <th>Amount</th>
+                        <th>Payment</th>
+                        <th>Status</th>
+                        <th>Booking Time</th>
+                        <th class="text-right">Attendees</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if bookings %}
+                        {% for b in bookings %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('tickets.view_ticket', booking_reference=b.booking_reference) }}" target="_blank" class="table-ref-link">
+                                        {{ b.booking_reference }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <strong>{{ b.user.full_name }}</strong>
+                                    <small class="text-muted d-block">{{ b.user.email }}</small>
+                                </td>
+                                <td>
+                                    <strong>{{ b.event.name }}</strong>
+                                    <small class="text-muted d-block">{{ b.event.event_date.strftime('%d %b %Y') }} at {{ b.event.event_time.strftime('%I:%M %p') }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge badge-secondary">{{ b.total_tickets }} Seats</span>
+                                    <small class="text-muted d-block">
+                                        {% for att in b.attendees %}{{ att.seat.seat_number }}{% if not loop.last %}, {% endif %}{% endfor %}
+                                    </small>
+                                </td>
+                                <td><strong>₹{{ "%.2f"|format(b.total_amount) }}</strong></td>
+                                <td>
+                                    <span class="badge badge-success">{{ b.payment.payment_method if b.payment else 'UPI' }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-success">{{ b.booking_status }}</span>
+                                </td>
+                                <td><small>{{ b.created_at.strftime('%d %b %Y, %H:%M') }}</small></td>
+                                <td class="text-right">
+                                    <button type="button" class="btn btn-outline btn-sm" onclick="showAttendeeModal({{ b.id }})">
+                                        <i class="fa-solid fa-users"></i> Inspect ({{ b.attendees|length }})
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Hidden Attendee JSON for Modal -->
+                            <script type="application/json" id="attendeeData_{{ b.id }}">
+                                {
+                                    "booking_ref": {{ b.booking_reference|tojson }},
+                                    "event_name": {{ b.event.name|tojson }},
+                                    "user_name": {{ b.user.full_name|tojson }},
+                                    "attendees": [
+                                        {% for att in b.attendees %}
+                                            {
+                                                "name": {{ att.full_name|tojson }},
+                                                "age": {{ att.age }},
+                                                "phone": {{ att.phone|tojson }},
+                                                "city": {{ att.city|tojson }},
+                                                "seat": {{ att.seat.seat_number|tojson if att.seat else "N/A"|tojson }},
+                                                "category": {{ att.seat.category|tojson if att.seat else "N/A"|tojson }},
+                                                "ticket_number": {{ att.ticket.ticket_number|tojson if att.ticket else "N/A"|tojson }}
+                                            }{% if not loop.last %},{% endif %}
+                                        {% endfor %}
+                                    ]
+                                }
+                            </script>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="9" class="text-center text-muted" style="padding: 2rem;">No bookings found matching criteria.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Attendee Manifest Modal Dialog -->
+<div class="modal-backdrop-custom hidden" id="attendeeModal">
+    <div class="modal-card-custom">
+        <div class="modal-header-custom">
+            <h3 id="modalBookingTitle">Attendee Manifest</h3>
+            <button type="button" class="modal-close-btn" onclick="closeAttendeeModal()">&times;</button>
+        </div>
+        <div class="modal-body-custom">
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Seat</th>
+                            <th>Category</th>
+                            <th>Attendee Name</th>
+                            <th>Age</th>
+                            <th>Phone</th>
+                            <th>City</th>
+                            <th>Ticket ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modalAttendeeRows">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-footer-custom">
+            <button type="button" class="btn btn-secondary" onclick="closeAttendeeModal()">Close</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showAttendeeModal(bookingId) {
+    const rawData = document.getElementById('attendeeData_' + bookingId).textContent;
+    const data = JSON.parse(rawData);
+
+    document.getElementById('modalBookingTitle').textContent = `Attendees for ${data.booking_ref} (${data.event_name})`;
+    const tbody = document.getElementById('modalAttendeeRows');
+    tbody.innerHTML = '';
+
+    data.attendees.forEach(att => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong class="text-danger">${att.seat}</strong></td>
+            <td>${att.category}</td>
+            <td><strong>${att.name}</strong></td>
+            <td>${att.age}</td>
+            <td>${att.phone}</td>
+            <td>${att.city}</td>
+            <td><code>${att.ticket_number}</code></td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    document.getElementById('attendeeModal').classList.remove('hidden');
+}
+
+function closeAttendeeModal() {
+    document.getElementById('attendeeModal').classList.add('hidden');
+}
+</script>
+{% endblock %}

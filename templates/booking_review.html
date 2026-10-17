@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Review Booking - {{ event.name }} | ShowSpot{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="booking-flow-page">
+    <!-- Stepper -->
+    <div class="stepper-container">
+        <div class="stepper-wrapper">
+            <div class="step-item completed"><div class="step-circle"><i class="fa-solid fa-check"></i></div><span class="step-label">Event</span></div>
+            <div class="step-line completed"></div>
+            <div class="step-item completed"><div class="step-circle"><i class="fa-solid fa-check"></i></div><span class="step-label">Seats</span></div>
+            <div class="step-line completed"></div>
+            <div class="step-item completed"><div class="step-circle"><i class="fa-solid fa-check"></i></div><span class="step-label">Attendees</span></div>
+            <div class="step-line active"></div>
+            <div class="step-item active"><div class="step-circle">4</div><span class="step-label">Review</span></div>
+            <div class="step-line"></div>
+            <div class="step-item"><div class="step-circle">5</div><span class="step-label">Payment</span></div>
+            <div class="step-line"></div>
+            <div class="step-item"><div class="step-circle">6</div><span class="step-label">Ticket</span></div>
+        </div>
+    </div>
+
+    <div class="section-container">
+        <div class="booking-layout-grid">
+            <!-- Review Details Main Column -->
+            <div class="booking-main-col">
+                <div class="booking-card">
+                    <div class="booking-card-header">
+                        <h2><i class="fa-solid fa-clipboard-check"></i> Review Booking Details</h2>
+                        <p>Please double-check your event schedule, seat selection, and attendee information before proceeding to payment.</p>
+                    </div>
+
+                    <!-- Event Information Card -->
+                    <div class="review-event-card">
+                        <div class="review-event-badge">{{ event.event_type }}</div>
+                        <h3 class="review-event-name">{{ event.name }}</h3>
+                        <div class="review-event-meta-grid">
+                            <div class="meta-block">
+                                <i class="fa-regular fa-calendar-days"></i>
+                                <div>
+                                    <strong>{{ event.event_date.strftime('%A, %d %B %Y') }}</strong>
+                                    <span>Date</span>
+                                </div>
+                            </div>
+                            <div class="meta-block">
+                                <i class="fa-regular fa-clock"></i>
+                                <div>
+                                    <strong>{{ event.event_time.strftime('%I:%M %p') }}</strong>
+                                    <span>Showtime</span>
+                                </div>
+                            </div>
+                            <div class="meta-block">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <div>
+                                    <strong>{{ event.venue }}</strong>
+                                    <span>{{ event.city }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attendee Breakdown Table -->
+                    <div class="attendee-table-box">
+                        <h4 class="table-section-title"><i class="fa-solid fa-id-card"></i> Attendee & Seat Manifest</h4>
+                        <div class="table-responsive">
+                            <table class="review-attendees-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Seat</th>
+                                        <th>Category</th>
+                                        <th>Attendee Name</th>
+                                        <th>Age</th>
+                                        <th>Phone</th>
+                                        <th>City</th>
+                                        <th class="text-right">Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for att in attendees %}
+                                        <tr>
+                                            <td>{{ loop.index }}</td>
+                                            <td><span class="table-seat-badge">{{ att.seat_number }}</span></td>
+                                            <td>{{ att.category }}</td>
+                                            <td><strong>{{ att.full_name }}</strong></td>
+                                            <td>{{ att.age }}</td>
+                                            <td>{{ att.phone }}</td>
+                                            <td>{{ att.city }}</td>
+                                            <td class="text-right font-weight-bold">₹{{ "%.2f"|format(att.price) }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="form-actions-bar">
+                        <a href="{{ url_for('booking.attendee_details', event_id=event.id) }}" class="btn btn-outline">
+                            <i class="fa-solid fa-pen-to-square"></i> Edit Details
+                        </a>
+                        <a href="{{ url_for('payment.payment_view') }}" class="btn btn-primary btn-lg">
+                            <span>Proceed to Payment</span>
+                            <i class="fa-solid fa-credit-card"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price Breakdown Column -->
+            <div class="booking-sidebar-col">
+                <div class="order-summary-card">
+                    <h3 class="summary-title"><i class="fa-solid fa-receipt"></i> Payment Breakdown</h3>
+                    
+                    <div class="price-breakdown-list">
+                        <div class="price-row">
+                            <span>Ticket Subtotal ({{ attendees|length }} seats)</span>
+                            <span class="price-val">₹{{ "%.2f"|format(pricing.subtotal) }}</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Convenience Fee (5%)</span>
+                            <span class="price-val">₹{{ "%.2f"|format(pricing.convenience_fee) }}</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Integrated GST (18% on Fee)</span>
+                            <span class="price-val">₹{{ "%.2f"|format(pricing.tax) }}</span>
+                        </div>
+                        <hr class="price-divider">
+                        <div class="price-row total-row">
+                            <strong>Total Amount Payable</strong>
+                            <strong class="grand-total-amount">₹{{ "%.2f"|format(pricing.total_amount) }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="payment-guarantee-note">
+                        <i class="fa-solid fa-shield-check text-success"></i>
+                        <span>Guaranteed reservation locked on server. Instant ticket QR dispatch upon payment.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

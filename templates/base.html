@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TixGo | Book Your Happiness - Cricket & Live Events{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="main-header">
+        <div class="nav-container">
+            <a href="{{ url_for('events.landing_page') }}" class="brand-logo">
+                <span class="logo-icon"><i class="fa-solid fa-ticket"></i></span>
+                <span class="logo-text">Tix<span class="highlight">Go</span></span>
+            </a>
+
+            <!-- Search Bar in Header -->
+            <form action="{{ url_for('events.landing_page') }}" method="GET" class="header-search">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" name="search" placeholder="Search cricket matches, concerts, live shows..." value="{{ request.args.get('search', '') }}">
+            </form>
+
+            <!-- Navigation Links -->
+            <nav class="nav-links" id="navLinks">
+                <a href="{{ url_for('events.landing_page') }}" class="nav-item {% if request.endpoint == 'events.landing_page' and not request.args.get('category') %}active{% endif %}">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+                <a href="{{ url_for('events.landing_page', category='Cricket') }}" class="nav-item {% if request.args.get('category') == 'Cricket' %}active{% endif %}">
+                    <i class="fa-solid fa-baseball-bat-ball"></i> Cricket
+                </a>
+                <a href="{{ url_for('events.landing_page', category='Concert') }}" class="nav-item {% if request.args.get('category') == 'Concert' %}active{% endif %}">
+                    <i class="fa-solid fa-music"></i> Concerts
+                </a>
+                <a href="{{ url_for('events.landing_page', category='General') }}" class="nav-item {% if request.args.get('category') == 'General' %}active{% endif %}">
+                    <i class="fa-solid fa-masks-theater"></i> Comedy & Shows
+                </a>
+                
+                {% if current_user %}
+                    <a href="{{ url_for('booking.my_bookings') }}" class="nav-item {% if request.endpoint == 'booking.my_bookings' %}active{% endif %}">
+                        <i class="fa-solid fa-receipt"></i> My Bookings
+                    </a>
+                    <div class="user-dropdown">
+                        <button class="user-profile-btn" id="userMenuBtn">
+                            <i class="fa-regular fa-circle-user"></i>
+                            <span class="user-name">{{ current_user.full_name.split()[0] }}</span>
+                            <i class="fa-solid fa-chevron-down caret-icon"></i>
+                        </button>
+                        <div class="dropdown-menu" id="userDropdownMenu">
+                            <div class="dropdown-header">
+                                <strong>{{ current_user.full_name }}</strong>
+                                <small>{{ current_user.email }}</small>
+                            </div>
+                            <a href="{{ url_for('booking.my_bookings') }}" class="dropdown-link">
+                                <i class="fa-solid fa-ticket-simple"></i> My Tickets
+                            </a>
+                            <hr class="dropdown-divider">
+                            <a href="{{ url_for('auth.logout') }}" class="dropdown-link text-danger">
+                                <i class="fa-solid fa-right-from-bracket"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="auth-buttons">
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Login</a>
+                        <a href="{{ url_for('auth.signup') }}" class="btn btn-primary">Sign Up</a>
+                    </div>
+                {% endif %}
+            </nav>
+
+            <!-- Mobile Hamburger Button -->
+            <button class="mobile-toggle-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Flash Messages Container (Toasts / Banners) -->
+    <div class="toast-container" id="toastContainer">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="toast-item toast-{{ category }}">
+                        <div class="toast-icon">
+                            {% if category == 'success' %}
+                                <i class="fa-solid fa-circle-check"></i>
+                            {% elif category in ('danger', 'error') %}
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                            {% elif category == 'warning' %}
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            {% else %}
+                                <i class="fa-solid fa-circle-info"></i>
+                            {% endif %}
+                        </div>
+                        <div class="toast-message">{{ message }}</div>
+                        <button class="toast-close" onclick="this.parentElement.remove();">&times;</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        {% if error_title %}
+            <div class="error-container">
+                <div class="error-card">
+                    <div class="error-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <h2>{{ error_title }}</h2>
+                    <p>{{ error_message }}</p>
+                    <a href="{{ url_for('events.landing_page') }}" class="btn btn-primary">Back to Home</a>
+                </div>
+            </div>
+        {% else %}
+            {% block content %}{% endblock %}
+        {% endif %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <a href="{{ url_for('events.landing_page') }}" class="brand-logo footer-logo">
+                    <span class="logo-icon"><i class="fa-solid fa-ticket"></i></span>
+                    <span class="logo-text">Tix<span class="highlight">Go</span></span>
+                </a>
+                <p class="footer-tagline">
+                    Book Your Happiness. The premier destination for booking tickets to championship cricket matches, live music concerts, and comedy arena shows with 360° interactive seating.
+                </p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links-group">
+                <h4>Categories</h4>
+                <ul>
+                    <li><a href="{{ url_for('events.landing_page', category='Cricket') }}">Cricket Matches</a></li>
+                    <li><a href="{{ url_for('events.landing_page', category='Concert') }}">Live Concerts</a></li>
+                    <li><a href="{{ url_for('events.landing_page', category='General') }}">Comedy & Shows</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links-group">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="{{ url_for('events.landing_page') }}">Browse All Events</a></li>
+                    <li><a href="{{ url_for('booking.my_bookings') }}">My Bookings</a></li>
+                    <li><a href="{{ url_for('auth.login') }}">User Sign In</a></li>
+                    <li><a href="{{ url_for('admin.admin_login') }}">Admin Portal</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="footer-bottom-container">
+                <p>&copy; {{ now_year }} Event Ticket Booking System. Built with Flask, SQLite, and Vanilla Web Technologies.</p>
+                <div class="admin-link-wrapper">
+                    <a href="{{ url_for('admin.admin_login') }}" class="admin-portal-link">
+                        <i class="fa-solid fa-user-shield"></i> Admin Access
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Global JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

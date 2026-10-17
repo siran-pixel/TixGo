@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}My Bookings | ShowSpot{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="my-bookings-page">
+    <div class="section-container">
+        <div class="page-title-header">
+            <div>
+                <h1><i class="fa-solid fa-receipt text-danger"></i> My Bookings</h1>
+                <p>Manage your active reservations, view digital QR tickets, and check booking history</p>
+            </div>
+            <a href="{{ url_for('events.landing_page') }}" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i> Book More Events
+            </a>
+        </div>
+
+        <!-- Bookings Tabs (Upcoming vs Past) -->
+        <div class="bookings-tabs-nav">
+            <button class="booking-tab-btn active" onclick="switchBookingsTab('upcoming', this)">
+                <i class="fa-solid fa-calendar-check"></i> Upcoming Events ({{ upcoming_bookings|length }})
+            </button>
+            <button class="booking-tab-btn" onclick="switchBookingsTab('past', this)">
+                <i class="fa-solid fa-clock-rotate-left"></i> Past Events ({{ past_bookings|length }})
+            </button>
+        </div>
+
+        <!-- Upcoming Bookings Panel -->
+        <div class="bookings-panel active" id="upcomingPanel">
+            {% if upcoming_bookings %}
+                <div class="bookings-cards-grid">
+                    {% for b in upcoming_bookings %}
+                        <div class="booking-item-card">
+                            <div class="item-card-header">
+                                <span class="booking-ref-badge"><i class="fa-solid fa-hashtag"></i> {{ b.booking_reference }}</span>
+                                <span class="badge badge-success"><i class="fa-solid fa-check"></i> {{ b.booking_status }}</span>
+                            </div>
+
+                            <div class="item-card-body">
+                                <h3 class="event-title">{{ b.event.name }}</h3>
+                                
+                                <div class="item-meta-list">
+                                    <div class="meta-row">
+                                        <i class="fa-regular fa-calendar"></i>
+                                        <span>{{ b.event.event_date.strftime('%a, %d %b %Y') }} at {{ b.event.event_time.strftime('%I:%M %p') }}</span>
+                                    </div>
+                                    <div class="meta-row">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                        <span>{{ b.event.venue }}, {{ b.event.city }}</span>
+                                    </div>
+                                    <div class="meta-row">
+                                        <i class="fa-solid fa-couch"></i>
+                                        <span>Seats ({{ b.total_tickets }}): 
+                                            <strong>{% for att in b.attendees %}{{ att.seat.seat_number }}{% if not loop.last %}, {% endif %}{% endfor %}</strong>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="item-price-strip">
+                                    <span>Total Amount Paid:</span>
+                                    <strong class="price-val">₹{{ "%.2f"|format(b.total_amount) }}</strong>
+                                </div>
+                            </div>
+
+                            <div class="item-card-footer">
+                                <a href="{{ url_for('tickets.view_ticket', booking_reference=b.booking_reference) }}" class="btn btn-primary btn-sm">
+                                    <i class="fa-solid fa-qrcode"></i> View Tickets
+                                </a>
+                                <a href="{{ url_for('tickets.download_ticket', booking_reference=b.booking_reference) }}" class="btn btn-outline btn-sm" target="_blank">
+                                    <i class="fa-solid fa-print"></i> Print
+                                </a>
+                                <button type="button" class="btn btn-outline btn-sm" onclick="handleShareTicket('{{ b.booking_reference }}', '{{ b.event.name }}')">
+                                    <i class="fa-solid fa-share-nodes"></i> Share
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-bookings-state">
+                    <div class="empty-icon"><i class="fa-regular fa-calendar-xmark"></i></div>
+                    <h3>No Upcoming Bookings</h3>
+                    <p>You haven't booked any upcoming events yet. Explore what's trending now!</p>
+                    <a href="{{ url_for('events.landing_page') }}" class="btn btn-primary">Browse Events</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Past Bookings Panel -->
+        <div class="bookings-panel" id="pastPanel">
+            {% if past_bookings %}
+                <div class="bookings-cards-grid">
+                    {% for b in past_bookings %}
+                        <div class="booking-item-card past-card">
+                            <div class="item-card-header">
+                                <span class="booking-ref-badge">{{ b.booking_reference }}</span>
+                                <span class="badge badge-secondary">Completed</span>
+                            </div>
+
+                            <div class="item-card-body">
+                                <h3 class="event-title">{{ b.event.name }}</h3>
+                                
+                                <div class="item-meta-list">
+                                    <div class="meta-row">
+                                        <i class="fa-regular fa-calendar"></i>
+                                        <span>{{ b.event.event_date.strftime('%d %b %Y') }}</span>
+                                    </div>
+                                    <div class="meta-row">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                        <span>{{ b.event.venue }}, {{ b.event.city }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="item-price-strip">
+                                    <span>Amount Paid:</span>
+                                    <span>₹{{ "%.2f"|format(b.total_amount) }}</span>
+                                </div>
+                            </div>
+
+                            <div class="item-card-footer">
+                                <a href="{{ url_for('tickets.view_ticket', booking_reference=b.booking_reference) }}" class="btn btn-outline btn-sm">
+                                    <i class="fa-solid fa-receipt"></i> View Receipt
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-bookings-state">
+                    <div class="empty-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                    <h3>No Past Bookings</h3>
+                    <p>Your past event history will appear here once events conclude.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/ticket.js') }}"></script>
+<script>
+function switchBookingsTab(tabName, btn) {
+    document.querySelectorAll('.booking-tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.bookings-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(tabName + 'Panel').classList.add('active');
+}
+</script>
+{% endblock %}

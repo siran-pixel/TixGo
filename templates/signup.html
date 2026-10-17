@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account | TixGo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-page-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo-badge">
+                <i class="fa-solid fa-user-plus"></i>
+            </div>
+            <h2>Create an Account</h2>
+            <p>Join TixGo to enjoy seamless 5-minute seat locking and instant QR tickets</p>
+        </div>
+
+        <form action="{{ url_for('auth.signup') }}" method="POST" class="auth-form" id="signupForm">
+            <div class="form-group">
+                <label for="fullName"><i class="fa-regular fa-user"></i> Full Name</label>
+                <input type="text" id="fullName" name="full_name" class="form-control" placeholder="e.g. Rahul Sharma" required autocomplete="name" autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="email"><i class="fa-regular fa-envelope"></i> Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="you@example.com" required autocomplete="email">
+                <small class="form-hint">Your email will be used for booking confirmations and login.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="phone"><i class="fa-solid fa-phone"></i> Phone Number</label>
+                <input type="tel" id="phone" name="phone" class="form-control" placeholder="e.g. 9876543210" required autocomplete="tel">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-half">
+                    <label for="password"><i class="fa-solid fa-lock"></i> Password</label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Min. 6 chars" required autocomplete="new-password">
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password', this)" aria-label="Toggle password visibility">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group col-half">
+                    <label for="confirmPassword"><i class="fa-solid fa-lock"></i> Confirm</label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="confirmPassword" name="confirm_password" class="form-control" placeholder="Re-enter" required autocomplete="new-password">
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('confirmPassword', this)" aria-label="Toggle password visibility">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="passwordMismatchError" class="validation-error-msg hidden">
+                <i class="fa-solid fa-circle-exclamation"></i> Passwords do not match.
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="signupSubmitBtn">
+                <span>Create Account</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{{ url_for('auth.login') }}" class="auth-accent-link">Sign in here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+{% endblock %}

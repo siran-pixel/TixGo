@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.name }} | Tickets on ShowSpot{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/events.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="event-details-page">
+    <!-- Event Hero Banner -->
+    <div class="event-hero-banner">
+        <div class="banner-overlay"></div>
+        <div class="section-container">
+            <div class="event-hero-content">
+                <div class="event-type-badge category-{{ event.event_type|lower }}">
+                    <i class="fa-solid fa-tag"></i> {{ event.event_type }}
+                </div>
+                <h1 class="event-title">{{ event.name }}</h1>
+                
+                <div class="event-meta-row">
+                    <div class="meta-item">
+                        <i class="fa-regular fa-calendar-days meta-icon"></i>
+                        <div>
+                            <strong>{{ event.event_date.strftime('%A, %d %B %Y') }}</strong>
+                            <span>Date</span>
+                        </div>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fa-regular fa-clock meta-icon"></i>
+                        <div>
+                            <strong>{{ event.event_time.strftime('%I:%M %p') }}</strong>
+                            <span>Time</span>
+                        </div>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fa-solid fa-location-dot meta-icon"></i>
+                        <div>
+                            <strong>{{ event.venue }}</strong>
+                            <span>{{ event.city }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details and Booking Action Section -->
+    <div class="section-container event-body-container">
+        <div class="event-main-col">
+            <!-- About Event -->
+            <div class="content-box">
+                <h2 class="box-title"><i class="fa-solid fa-circle-info"></i> About the Event</h2>
+                <p class="event-description-text">{{ event.description }}</p>
+            </div>
+
+            <!-- Seating & Pricing Tier Guide -->
+            <div class="content-box">
+                <h2 class="box-title"><i class="fa-solid fa-chair"></i> Ticket Categories & Pricing</h2>
+                <div class="pricing-tiers-grid">
+                    {% if event.event_type == 'Cricket' %}
+                        <div class="pricing-tier-card">
+                            <span class="tier-badge tier-lower">Lower Stand</span>
+                            <div class="tier-price">₹2,000</div>
+                            <p class="tier-desc">Ground-level pitch view close to boundary lines (150 seats per stand).</p>
+                        </div>
+                        <div class="pricing-tier-card">
+                            <span class="tier-badge tier-upper">Upper Stand</span>
+                            <div class="tier-price">₹1,350</div>
+                            <p class="tier-desc">Elevated panoramic stadium view across 10 stands (100 seats per stand).</p>
+                        </div>
+                    {% elif event.event_type == 'Concert' %}
+                        <div class="pricing-tier-card">
+                            <span class="tier-badge tier-elite">Elite Zone</span>
+                            <div class="tier-price">₹3,000</div>
+                            <p class="tier-desc">Front-row VIP access (50 limited seats).</p>
+                        </div>
+                        <div class="pricing-tier-card">
+                            <span class="tier-badge tier-gold">Gold Zone</span>
+                            <div class="tier-price">₹2,000</div>
+                            <p class="tier-desc">Prime center floor access.</p>
+                        </div>
+                        <div class="pricing-tier-card">
+                            <span class="tier-badge tier-silver">Silver Zone</span>
+                            <div class="tier-price">₹1,000</div>
+                            <p class="tier-desc">General standing & seated concert hall area.</p>
+                        </div>
+                    {% else %}
+                        <div class="pricing-tier-card">
+                            <span class="tier-badge tier-general">General Admission</span>
+                            <div class="tier-price">₹{{ "%.0f"|format(event.min_price) }}</div>
+                            <p class="tier-desc">Standard reserved hall seating.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Important Terms -->
+            <div class="content-box terms-box">
+                <h3 class="terms-title"><i class="fa-solid fa-shield-halved"></i> Important Information</h3>
+                <ul class="terms-list">
+                    <li>Tickets once locked will be reserved for <strong>5 minutes</strong> to complete attendee details and payment.</li>
+                    <li>Maximum of <strong>10 tickets</strong> allowed per transaction.</li>
+                    <li>Please bring a valid Government ID matching the attendee name for venue entry.</li>
+                    <li>Consolidated E-Tickets with individual QR codes will be generated instantly upon confirmation.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Sticky Sidebar CTA -->
+        <div class="event-sidebar-col">
+            <div class="booking-cta-card">
+                <div class="cta-price-header">
+                    <span class="cta-price-label">Tickets from</span>
+                    <span class="cta-price-val">₹{{ "%.0f"|format(event.min_price) }}</span>
+                </div>
+
+                <div class="cta-status-info">
+                    <div class="status-item">
+                        <i class="fa-solid fa-users"></i>
+                        <span>Total Capacity: <strong>{{ event.total_seats }} Seats</strong></span>
+                    </div>
+                    <div class="status-item">
+                        <i class="fa-solid fa-circle-check text-success"></i>
+                        <span>Available: <strong>{{ event.available_seats_count }} Seats</strong></span>
+                    </div>
+                </div>
+
+                <hr class="cta-divider">
+
+                {% if event.status == 'ACTIVE' and event.available_seats_count > 0 %}
+                    <a href="{{ url_for('seats.seat_selection_view', event_id=event.id) }}" class="btn btn-primary btn-block btn-lg cta-btn pulse-button">
+                        <i class="fa-solid fa-couch"></i>
+                        <span>Select Seats</span>
+                    </a>
+                {% elif event.status != 'ACTIVE' %}
+                    <button class="btn btn-secondary btn-block btn-lg" disabled>
+                        <span>Event {{ event.status }}</span>
+                    </button>
+                {% else %}
+                    <button class="btn btn-secondary btn-block btn-lg" disabled>
+                        <span>Sold Out</span>
+                    </button>
+                {% endif %}
+
+                <p class="cta-security-text">
+                    <i class="fa-solid fa-lock"></i> 100% Secure Transaction with Verified QR
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,929 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Seat Management & VIP Reservations | TixGo Admin{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/seats.css') }}">
+<style>
+/* Admin Seat Management Custom Enhancements */
+.admin-seats-toolbar {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.75rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+}
+
+.admin-event-picker {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 300px;
+}
+
+.admin-event-picker label {
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    margin-bottom: 0;
+}
+
+.admin-event-picker select {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #0f172a;
+    padding: 0.55rem 0.85rem;
+    border-radius: var(--radius-md);
+    font-size: 0.88rem;
+    font-weight: 600;
+    width: 100%;
+}
+
+.admin-seat-actions-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.75rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.admin-actions-flex {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.admin-reason-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.admin-reason-group label {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #334155;
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+.admin-reason-input {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #0f172a;
+    padding: 0.5rem 0.85rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    min-width: 220px;
+}
+
+.admin-reason-input:focus {
+    border-color: #f97316;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+}
+
+.reason-preset-pills {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.reason-preset-pill {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.reason-preset-pill:hover,
+.reason-preset-pill.active {
+    background: #fff7ed;
+    border-color: #fdba74;
+    color: #ea580c;
+}
+
+.action-buttons-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.selected-seats-chip-tray {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f1f5f9;
+    font-size: 0.85rem;
+}
+
+.admin-selected-chip {
+    background: #fff7ed;
+    border: 1px solid #fdba74;
+    color: #c2410c;
+    padding: 0.15rem 0.55rem;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.78rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.admin-selected-chip .chip-remove {
+    cursor: pointer;
+    color: #ea580c;
+}
+
+/* Custom Admin Seat Selection Highlights */
+.seat.admin-selected {
+    background: #ffedd5 !important;
+    border-color: #ea580c !important;
+    color: #ea580c !important;
+    transform: scale(1.15) !important;
+    box-shadow: 0 0 10px rgba(234, 88, 12, 0.4) !important;
+    z-index: 20;
+}
+
+.seat.admin-locked {
+    cursor: pointer !important;
+}
+
+.seat.admin-locked.admin-selected {
+    background: #fef2f2 !important;
+    border-color: #dc2626 !important;
+    color: #dc2626 !important;
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.4) !important;
+}
+
+.metric-purple .metric-icon-box {
+    background: rgba(168, 85, 247, 0.12);
+    color: #9333ea;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-page-container">
+    <!-- Header -->
+    <div class="admin-page-header">
+        <div>
+            <h1><i class="fa-solid fa-couch"></i> Seat Management & VIP Reservations</h1>
+            <p>Select specific seats to reserve/lock for Resource Persons, Chief Guests, and VIPs, or release them back to public booking.</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('admin.admin_events') }}" class="btn btn-outline">
+                <i class="fa-solid fa-arrow-left"></i> Back to Events
+            </a>
+            {% if selected_event %}
+            <a href="{{ url_for('seats.seat_selection_view', event_id=selected_event.id) }}" target="_blank" class="btn btn-outline" title="Preview User Seat Map">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Preview User View
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Event Selector Toolbar -->
+    <div class="admin-seats-toolbar">
+        <form method="GET" action="{{ url_for('admin.admin_seats') }}" class="admin-event-picker" id="eventSelectForm">
+            <label for="eventPickerSelect"><i class="fa-solid fa-calendar-check text-primary"></i> Select Event:</label>
+            <select id="eventPickerSelect" name="event_id" onchange="document.getElementById('eventSelectForm').submit();">
+                {% for ev in events %}
+                    <option value="{{ ev.id }}" {% if selected_event and selected_event.id == ev.id %}selected{% endif %}>
+                        {{ ev.name }} ({{ ev.event_type }} - {{ ev.city }})
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+
+        {% if selected_event %}
+        <div class="event-meta-summary" style="font-size: 0.85rem; color: #64748b; display: flex; gap: 1rem; align-items: center;">
+            <span><i class="fa-regular fa-calendar"></i> {{ selected_event.event_date.strftime('%d %b %Y') }}</span>
+            <span><i class="fa-solid fa-location-dot"></i> {{ selected_event.venue }}, {{ selected_event.city }}</span>
+            <span class="event-type-pill pill-{{ selected_event.event_type|lower }}">{{ selected_event.event_type }}</span>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if selected_event %}
+    <!-- KPI Counters Grid -->
+    <div class="metrics-grid">
+        <div class="metric-card metric-primary">
+            <div class="metric-icon-box"><i class="fa-solid fa-chair"></i></div>
+            <div class="metric-data">
+                <span class="metric-label">Total Capacity</span>
+                <strong class="metric-value" id="kpiTotalSeats">{{ stats.total }}</strong>
+                <span class="metric-subtext">Total Provisioned Seats</span>
+            </div>
+        </div>
+
+        <div class="metric-card metric-success">
+            <div class="metric-icon-box"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="metric-data">
+                <span class="metric-label">Available for Sale</span>
+                <strong class="metric-value" id="kpiAvailableSeats">{{ stats.available }}</strong>
+                <span class="metric-subtext">Publicly Bookable</span>
+            </div>
+        </div>
+
+        <div class="metric-card metric-purple">
+            <div class="metric-icon-box"><i class="fa-solid fa-user-tie"></i></div>
+            <div class="metric-data">
+                <span class="metric-label">Reserved (Admin Locked)</span>
+                <strong class="metric-value" id="kpiAdminLockedSeats">{{ stats.admin_locked }}</strong>
+                <span class="metric-subtext">VIPs & Resource Persons</span>
+            </div>
+        </div>
+
+        <div class="metric-card metric-info">
+            <div class="metric-icon-box"><i class="fa-solid fa-ticket"></i></div>
+            <div class="metric-data">
+                <span class="metric-label">Customer Booked</span>
+                <strong class="metric-value" id="kpiBookedSeats">{{ stats.booked }}</strong>
+                <span class="metric-subtext">Confirmed Tickets</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seat Action Controls Card -->
+    <div class="admin-seat-actions-card">
+        <div class="admin-actions-flex">
+            <!-- Reservation Reason Input & Presets -->
+            <div class="admin-reason-group">
+                <label for="adminReserveReason"><i class="fa-solid fa-tag text-primary"></i> Reservation Reason / Role:</label>
+                <input type="text" id="adminReserveReason" class="admin-reason-input" placeholder="e.g. Resource Person" value="Resource Person">
+                <div class="reason-preset-pills">
+                    <span class="reason-preset-pill active" onclick="setReserveReason('Resource Person', this)">Resource Person</span>
+                    <span class="reason-preset-pill" onclick="setReserveReason('Chief Guest', this)">Chief Guest</span>
+                    <span class="reason-preset-pill" onclick="setReserveReason('VIP Guest', this)">VIP Guest</span>
+                    <span class="reason-preset-pill" onclick="setReserveReason('Special Invitee', this)">Special Invitee</span>
+                    <span class="reason-preset-pill" onclick="setReserveReason('Keynote Speaker', this)">Speaker</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons-wrap">
+                <button type="button" class="btn btn-primary btn-sm" id="btnAdminLock" onclick="executeAdminLock()" disabled>
+                    <i class="fa-solid fa-user-tie"></i> Lock for Resource Persons (<span id="lockCountBadge">0</span>)
+                </button>
+                <button type="button" class="btn btn-outline btn-sm" id="btnAdminUnlock" onclick="executeAdminUnlock()" disabled style="color: #dc2626; border-color: #fca5a5;">
+                    <i class="fa-solid fa-lock-open"></i> Unlock Selected (<span id="unlockCountBadge">0</span>)
+                </button>
+                <button type="button" class="btn btn-outline btn-sm" id="btnClearSelection" onclick="clearAdminSelection()" disabled>
+                    <i class="fa-solid fa-xmark"></i> Clear
+                </button>
+            </div>
+        </div>
+
+        <!-- Selected Seats Chips Tray -->
+        <div class="selected-seats-chip-tray" id="adminSelectedChipsTray">
+            <span class="text-muted"><i class="fa-regular fa-hand-pointer"></i> Click seats below to select them for locking or unlocking.</span>
+        </div>
+    </div>
+
+    <!-- Interactive Seat Map View -->
+    <div class="admin-panel-card" style="padding: 1.5rem;">
+        <div class="panel-header" style="margin-bottom: 1rem;">
+            <h3><i class="fa-solid fa-map-location-dot"></i> Interactive Venue Seat Map</h3>
+            <div class="seat-legend-box" style="margin-bottom: 0; padding: 0.5rem 1rem;">
+                <div class="legend-item">
+                    <span class="legend-seat seat-sample available"></span>
+                    <span>Available</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-seat seat-sample" style="background: #ffedd5; border: 1.5px solid #ea580c;"></span>
+                    <span>Selected</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-seat seat-sample admin-locked"><i class="fa-solid fa-user-tie"></i></span>
+                    <span>Reserved (VIP)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-seat seat-sample booked"><i class="fa-solid fa-xmark"></i></span>
+                    <span>Booked</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-seat seat-sample locked"><i class="fa-solid fa-lock"></i></span>
+                    <span>User Lock</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stand Selector Bar (Only for Cricket) -->
+        {% if selected_event.event_type == 'Cricket' %}
+        <div class="stadium-stand-selector-bar" style="border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+            <div class="section-container" style="padding: 0 1rem;">
+                <div class="stadium-nav-header">
+                    <div class="stand-tabs-wrapper">
+                        <span class="stand-selector-title"><i class="fa-solid fa-compass"></i> Select Stand:</span>
+                        <button class="stand-tab active" data-stand="Stand A" onclick="switchAdminStand('Stand A', this)">Stand A</button>
+                        <button class="stand-tab" data-stand="Stand B" onclick="switchAdminStand('Stand B', this)">Stand B</button>
+                        <button class="stand-tab" data-stand="Stand C" onclick="switchAdminStand('Stand C', this)">Stand C</button>
+                        <button class="stand-tab" data-stand="Stand D" onclick="switchAdminStand('Stand D', this)">Stand D</button>
+                        <button class="stand-tab" data-stand="Stand E" onclick="switchAdminStand('Stand E', this)">Stand E</button>
+                        <button class="stand-tab" data-stand="Stand F" onclick="switchAdminStand('Stand F', this)">Stand F</button>
+                        <button class="stand-tab" data-stand="Stand G" onclick="switchAdminStand('Stand G', this)">Stand G</button>
+                        <button class="stand-tab" data-stand="Stand H" onclick="switchAdminStand('Stand H', this)">Stand H</button>
+                        <button class="stand-tab" data-stand="Stand I" onclick="switchAdminStand('Stand I', this)">Stand I</button>
+                        <button class="stand-tab" data-stand="Pavilion End" onclick="switchAdminStand('Pavilion End', this)">Pavilion End</button>
+                    </div>
+                </div>
+                <div class="tier-sub-filter" style="margin-top: 0.75rem;">
+                    <button class="tier-btn active" data-tier="all" onclick="switchAdminTier('all', this)">
+                        <i class="fa-solid fa-layer-group"></i> All Tiers
+                    </button>
+                    <button class="tier-btn tier-lower-btn" data-tier="Lower" onclick="switchAdminTier('Lower', this)">
+                        <i class="fa-solid fa-arrow-down-wide-short"></i> Lower Stand (150 Seats)
+                    </button>
+                    <button class="tier-btn tier-upper-btn" data-tier="Upper" onclick="switchAdminTier('Upper', this)">
+                        <i class="fa-solid fa-arrow-up-wide-short"></i> Upper Stand (100 Seats)
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Interactive Map Viewport -->
+        <div class="seat-grid-container" id="adminSeatGridContainer" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: var(--radius-md); min-height: 500px;">
+            <div class="seat-grid-viewport" id="adminSeatGridViewport">
+                <div class="seat-loading-state" style="text-align: center; padding: 4rem;">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                    <p>Loading interactive venue seating map...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="admin-panel-card" style="text-align: center; padding: 4rem 2rem;">
+        <i class="fa-solid fa-calendar-xmark" style="font-size: 3rem; color: #94a3b8; margin-bottom: 1rem;"></i>
+        <h3>No Events Available</h3>
+        <p class="text-muted">Create an event first to manage and reserve seats.</p>
+        <a href="{{ url_for('admin.admin_add_event') }}" class="btn btn-primary" style="margin-top: 1rem;">
+            <i class="fa-solid fa-plus"></i> Create New Event
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if selected_event %}
+<script>
+// Admin Seat Management Engine
+class AdminSeatManager {
+    constructor(eventId, eventType) {
+        this.eventId = eventId;
+        this.eventType = eventType;
+        this.seatsData = [];
+        this.activeStand = 'Stand A';
+        this.activeTier = 'all';
+
+        // Sets of selected seat IDs for admin action
+        this.selectedForLock = new Set();
+        this.selectedForUnlock = new Set();
+
+        this.init();
+    }
+
+    async init() {
+        await this.loadSeats();
+        this.render();
+    }
+
+    async loadSeats() {
+        try {
+            const res = await fetch(`/api/events/${this.eventId}/seats`);
+            const data = await res.json();
+            if (data.success) {
+                this.seatsData = data.seats || [];
+            }
+        } catch (err) {
+            console.error('Failed to load seats', err);
+        }
+    }
+
+    // Group Helper
+    groupSeatsBySectionAndRow(seats) {
+        const sections = {};
+        seats.forEach(seat => {
+            if (!sections[seat.section]) sections[seat.section] = {};
+
+            let rowKey = seat.row_label;
+            if (!rowKey) {
+                if (seat.seat_number.includes('-')) {
+                    const parts = seat.seat_number.split('-');
+                    if (parts.length >= 3) {
+                        rowKey = parts[1];
+                    } else if (parts[0].toUpperCase() === 'ELITE' || parts[0].toUpperCase() === 'VIP') {
+                        const seatNum = parseInt(parts[1], 10) || 1;
+                        const rowIdx = Math.ceil(seatNum / 10);
+                        rowKey = `E${rowIdx}`;
+                    } else if (/^[A-Z]+\d+$/i.test(parts[0])) {
+                        rowKey = parts[0];
+                    } else {
+                        rowKey = parts[0];
+                    }
+                } else {
+                    rowKey = seat.seat_number.replace(/[0-9]/g, '') || 'R';
+                }
+            }
+
+            if (!sections[seat.section][rowKey]) sections[seat.section][rowKey] = [];
+            sections[seat.section][rowKey].push(seat);
+        });
+        return sections;
+    }
+
+    render() {
+        const viewport = document.getElementById('adminSeatGridViewport');
+        viewport.innerHTML = '';
+
+        if (this.eventType === 'Cricket') {
+            this.renderCricket(viewport);
+        } else if (this.eventType === 'Concert') {
+            this.renderConcert(viewport);
+        } else {
+            this.renderGeneral(viewport);
+        }
+    }
+
+    renderCricket(container) {
+        let filtered = this.seatsData.filter(s => s.section.toLowerCase().includes(this.activeStand.toLowerCase()));
+        if (filtered.length === 0) {
+            filtered = this.seatsData;
+        }
+        if (this.activeTier !== 'all') {
+            filtered = filtered.filter(s => s.category.toLowerCase().includes(this.activeTier.toLowerCase()));
+        }
+
+        const sections = this.groupSeatsBySectionAndRow(filtered);
+        const sortedKeys = Object.keys(sections).sort((a, b) => {
+            const isLowerA = a.toLowerCase().includes('lower');
+            const isLowerB = b.toLowerCase().includes('lower');
+            if (isLowerA && !isLowerB) return -1;
+            if (!isLowerA && isLowerB) return 1;
+            return a.localeCompare(b);
+        });
+
+        for (const sectionName of sortedKeys) {
+            const rows = sections[sectionName];
+            const isLower = sectionName.toLowerCase().includes('lower');
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = `seat-section-block ${isLower ? 'section-lower' : 'section-upper'}`;
+
+            const firstSeat = Object.values(rows)[0][0];
+            sectionDiv.innerHTML = `
+                <div class="section-block-header">
+                    <h4 class="section-block-title">
+                        <i class="fa-solid ${isLower ? 'fa-arrow-down-wide-short' : 'fa-arrow-up-wide-short'}"></i>
+                        ${sectionName.toUpperCase()} &bull; ₹${firstSeat.price}
+                    </h4>
+                </div>
+            `;
+
+            for (const [rowLabel, rowSeats] of Object.entries(rows)) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'seat-row';
+
+                const labelSpan = document.createElement('span');
+                labelSpan.className = 'row-label';
+                labelSpan.textContent = rowLabel;
+                rowDiv.appendChild(labelSpan);
+
+                rowSeats.forEach(seat => {
+                    rowDiv.appendChild(this.createAdminSeatEl(seat));
+                });
+                sectionDiv.appendChild(rowDiv);
+            }
+            container.appendChild(sectionDiv);
+        }
+    }
+
+    renderConcert(container) {
+        // Stage Banner
+        const stage = document.createElement('div');
+        stage.className = 'stage-direction-container';
+        stage.innerHTML = '<div class="concert-stage-banner"><i class="fa-solid fa-compact-disc"></i> MAIN CONCERT STAGE</div>';
+        container.appendChild(stage);
+
+        const sections = this.groupSeatsBySectionAndRow(this.seatsData);
+        for (const [sectionName, rows] of Object.entries(sections)) {
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'seat-section-block';
+            const firstSeat = Object.values(rows)[0][0];
+            sectionDiv.innerHTML = `<h4 class="section-block-title">${sectionName} &bull; ₹${firstSeat.price}</h4>`;
+
+            for (const [rowLabel, rowSeats] of Object.entries(rows)) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'seat-row';
+
+                const labelSpan = document.createElement('span');
+                labelSpan.className = 'row-label';
+                labelSpan.textContent = rowLabel.replace('ELITE', 'E').replace('GOLD', 'G').replace('SILVER', 'S');
+                rowDiv.appendChild(labelSpan);
+
+                rowSeats.forEach(seat => {
+                    rowDiv.appendChild(this.createAdminSeatEl(seat));
+                });
+                sectionDiv.appendChild(rowDiv);
+            }
+            container.appendChild(sectionDiv);
+        }
+    }
+
+    renderGeneral(container) {
+        // Stage Banner
+        const stage = document.createElement('div');
+        stage.className = 'stage-direction-container';
+        stage.innerHTML = '<div class="general-stage-banner"><i class="fa-solid fa-masks-theater"></i> PERFORMANCE STAGE</div>';
+        container.appendChild(stage);
+
+        const sections = this.groupSeatsBySectionAndRow(this.seatsData);
+        for (const [sectionName, rows] of Object.entries(sections)) {
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'seat-section-block';
+            const firstSeat = Object.values(rows)[0][0];
+            sectionDiv.innerHTML = `<h4 class="section-block-title">${sectionName} &bull; ₹${firstSeat.price}</h4>`;
+
+            for (const [rowLabel, rowSeats] of Object.entries(rows)) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'seat-row';
+
+                const labelSpan = document.createElement('span');
+                labelSpan.className = 'row-label';
+                labelSpan.textContent = rowLabel;
+                rowDiv.appendChild(labelSpan);
+
+                rowSeats.forEach(seat => {
+                    rowDiv.appendChild(this.createAdminSeatEl(seat));
+                });
+                sectionDiv.appendChild(rowDiv);
+            }
+            container.appendChild(sectionDiv);
+        }
+    }
+
+    createAdminSeatEl(seat) {
+        const div = document.createElement('div');
+        div.id = `admin-seat-${seat.id}`;
+        div.dataset.seatId = seat.id;
+        div.dataset.seatNumber = seat.seat_number;
+        div.dataset.status = seat.status;
+
+        const isSelectedLock = this.selectedForLock.has(seat.id);
+        const isSelectedUnlock = this.selectedForUnlock.has(seat.id);
+        const isAdminLocked = seat.status === 'ADMIN_LOCKED';
+        const isBooked = seat.status === 'BOOKED';
+        const isUserLocked = seat.status === 'LOCKED';
+
+        let cls = 'seat';
+        if (isAdminLocked) {
+            cls += ' admin-locked';
+            if (isSelectedUnlock) cls += ' admin-selected';
+        } else if (isBooked) {
+            cls += ' booked';
+        } else if (isUserLocked) {
+            cls += ' locked';
+        } else {
+            cls += ' available';
+            if (isSelectedLock) cls += ' admin-selected';
+        }
+        div.className = cls;
+
+        // Tooltip
+        let tip = `${seat.seat_number} - ₹${seat.price} (${seat.status})`;
+        if (isAdminLocked) {
+            const r = seat.admin_reserve_reason ? ` (${seat.admin_reserve_reason})` : '';
+            tip = `${seat.seat_number} - Reserved by Admin${r} [Click to select for unlocking]`;
+        } else if (isBooked) {
+            tip = `${seat.seat_number} - Already Booked by Customer`;
+        } else {
+            tip = `${seat.seat_number} - Available [Click to select for VIP locking]`;
+        }
+        div.title = tip;
+
+        // Label
+        let num = seat.seat_number;
+        if (num.includes('-')) num = num.split('-').pop();
+        else num = num.replace(/^[A-Z]+/, '');
+
+        if (isAdminLocked) {
+            div.innerHTML = '<i class="fa-solid fa-user-tie"></i>';
+        } else if (isBooked) {
+            div.textContent = '';
+        } else if (isUserLocked) {
+            div.innerHTML = '<i class="fa-solid fa-lock"></i>';
+        } else {
+            div.textContent = num;
+        }
+
+        div.addEventListener('click', () => this.handleSeatClick(seat));
+        return div;
+    }
+
+    handleSeatClick(seat) {
+        if (seat.status === 'BOOKED') {
+            showToast(`Seat ${seat.seat_number} is already booked by a customer and cannot be modified.`, 'info');
+            return;
+        }
+
+        if (seat.status === 'ADMIN_LOCKED') {
+            // Toggle for unlock
+            if (this.selectedForUnlock.has(seat.id)) {
+                this.selectedForUnlock.delete(seat.id);
+            } else {
+                this.selectedForUnlock.add(seat.id);
+            }
+        } else {
+            // Available or temporary lock: toggle for admin lock
+            if (this.selectedForLock.has(seat.id)) {
+                this.selectedForLock.delete(seat.id);
+            } else {
+                this.selectedForLock.add(seat.id);
+            }
+        }
+
+        this.updateSeatElementDOM(seat.id);
+        this.updateToolbarUI();
+    }
+
+    updateSeatElementDOM(seatId) {
+        const el = document.getElementById(`admin-seat-${seatId}`);
+        if (!el) return;
+        const seat = this.seatsData.find(s => s.id === seatId);
+        if (!seat) return;
+
+        const isSelectedLock = this.selectedForLock.has(seat.id);
+        const isSelectedUnlock = this.selectedForUnlock.has(seat.id);
+        const isAdminLocked = seat.status === 'ADMIN_LOCKED';
+        const isBooked = seat.status === 'BOOKED';
+
+        let cls = 'seat';
+        if (isAdminLocked) {
+            cls += ' admin-locked';
+            if (isSelectedUnlock) cls += ' admin-selected';
+            el.innerHTML = '<i class="fa-solid fa-user-tie"></i>';
+        } else if (isBooked) {
+            cls += ' booked';
+            el.textContent = '';
+        } else {
+            cls += ' available';
+            if (isSelectedLock) cls += ' admin-selected';
+            let num = seat.seat_number;
+            if (num.includes('-')) num = num.split('-').pop();
+            else num = num.replace(/^[A-Z]+/, '');
+            el.textContent = num;
+        }
+        el.className = cls;
+    }
+
+    updateToolbarUI() {
+        const lockCount = this.selectedForLock.size;
+        const unlockCount = this.selectedForUnlock.size;
+
+        document.getElementById('lockCountBadge').textContent = lockCount;
+        document.getElementById('unlockCountBadge').textContent = unlockCount;
+
+        const btnLock = document.getElementById('btnAdminLock');
+        const btnUnlock = document.getElementById('btnAdminUnlock');
+        const btnClear = document.getElementById('btnClearSelection');
+
+        btnLock.disabled = lockCount === 0;
+        btnUnlock.disabled = unlockCount === 0;
+        btnClear.disabled = (lockCount + unlockCount) === 0;
+
+        // Render Chips Tray
+        const tray = document.getElementById('adminSelectedChipsTray');
+        tray.innerHTML = '';
+
+        if (lockCount === 0 && unlockCount === 0) {
+            tray.innerHTML = '<span class="text-muted"><i class="fa-regular fa-hand-pointer"></i> Click seats below to select them for locking or unlocking.</span>';
+            return;
+        }
+
+        if (lockCount > 0) {
+            const strong = document.createElement('strong');
+            strong.textContent = `To Lock (${lockCount}): `;
+            tray.appendChild(strong);
+
+            this.selectedForLock.forEach(seatId => {
+                const s = this.seatsData.find(x => x.id === seatId);
+                const chip = document.createElement('span');
+                chip.className = 'admin-selected-chip';
+                chip.innerHTML = `${s ? s.seat_number : seatId} <span class="chip-remove" onclick="seatManager.deselectSeat(${seatId}, 'lock')">&times;</span>`;
+                tray.appendChild(chip);
+            });
+        }
+
+        if (unlockCount > 0) {
+            const strong = document.createElement('strong');
+            strong.style.marginLeft = '1rem';
+            strong.style.color = '#dc2626';
+            strong.textContent = `To Unlock (${unlockCount}): `;
+            tray.appendChild(strong);
+
+            this.selectedForUnlock.forEach(seatId => {
+                const s = this.seatsData.find(x => x.id === seatId);
+                const chip = document.createElement('span');
+                chip.className = 'admin-selected-chip';
+                chip.style.borderColor = '#fca5a5';
+                chip.style.background = '#fef2f2';
+                chip.style.color = '#dc2626';
+                chip.innerHTML = `${s ? s.seat_number : seatId} <span class="chip-remove" onclick="seatManager.deselectSeat(${seatId}, 'unlock')">&times;</span>`;
+                tray.appendChild(chip);
+            });
+        }
+    }
+
+    deselectSeat(seatId, type) {
+        if (type === 'lock') {
+            this.selectedForLock.delete(seatId);
+        } else {
+            this.selectedForUnlock.delete(seatId);
+        }
+        this.updateSeatElementDOM(seatId);
+        this.updateToolbarUI();
+    }
+
+    clearSelection() {
+        const allIds = [...this.selectedForLock, ...this.selectedForUnlock];
+        this.selectedForLock.clear();
+        this.selectedForUnlock.clear();
+        allIds.forEach(id => this.updateSeatElementDOM(id));
+        this.updateToolbarUI();
+    }
+}
+
+// Global Seat Manager Instance
+let seatManager = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    seatManager = new AdminSeatManager({{ selected_event.id }}, '{{ selected_event.event_type }}');
+});
+
+// Preset Reason Pill Click
+function setReserveReason(text, el) {
+    document.getElementById('adminReserveReason').value = text;
+    document.querySelectorAll('.reason-preset-pill').forEach(p => p.classList.remove('active'));
+    if (el) el.classList.add('active');
+}
+
+// Stand Filter Switcher
+function switchAdminStand(standName, btn) {
+    if (!seatManager) return;
+    seatManager.activeStand = standName;
+    document.querySelectorAll('.stand-tab').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    seatManager.render();
+}
+
+// Tier Filter Switcher
+function switchAdminTier(tier, btn) {
+    if (!seatManager) return;
+    seatManager.activeTier = tier;
+    document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    seatManager.render();
+}
+
+// Clear Selection
+function clearAdminSelection() {
+    if (seatManager) seatManager.clearSelection();
+}
+
+// Execute Admin Lock
+async function executeAdminLock() {
+    if (!seatManager || seatManager.selectedForLock.size === 0) return;
+
+    const seatIds = Array.from(seatManager.selectedForLock);
+    const reason = document.getElementById('adminReserveReason').value.trim() || 'Resource Person';
+
+    const btn = document.getElementById('btnAdminLock');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locking...';
+
+    try {
+        const response = await fetch(`/admin/api/events/${seatManager.eventId}/seats/lock`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                seat_ids: seatIds,
+                reason: reason
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            showToast(data.message || `Successfully locked ${seatIds.length} seat(s) for ${reason}.`, 'success');
+
+            // Update in-memory seatsData
+            seatIds.forEach(id => {
+                const s = seatManager.seatsData.find(x => x.id === id);
+                if (s) {
+                    s.status = 'ADMIN_LOCKED';
+                    s.admin_reserve_reason = reason;
+                }
+            });
+
+            // Update KPI counters
+            const availEl = document.getElementById('kpiAvailableSeats');
+            const lockedEl = document.getElementById('kpiAdminLockedSeats');
+            if (availEl) availEl.textContent = Math.max(0, parseInt(availEl.textContent) - seatIds.length);
+            if (lockedEl) lockedEl.textContent = parseInt(lockedEl.textContent) + seatIds.length;
+
+            seatManager.selectedForLock.clear();
+            seatManager.render();
+            seatManager.updateToolbarUI();
+        } else {
+            showToast(data.message || 'Failed to lock seats.', 'danger');
+        }
+    } catch (err) {
+        showToast('Network error while locking seats.', 'danger');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-user-tie"></i> Lock for Resource Persons (<span id="lockCountBadge">${seatManager.selectedForLock.size}</span>)`;
+    }
+}
+
+// Execute Admin Unlock
+async function executeAdminUnlock() {
+    if (!seatManager || seatManager.selectedForUnlock.size === 0) return;
+
+    const seatIds = Array.from(seatManager.selectedForUnlock);
+
+    const btn = document.getElementById('btnAdminUnlock');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Unlocking...';
+
+    try {
+        const response = await fetch(`/admin/api/events/${seatManager.eventId}/seats/unlock`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                seat_ids: seatIds
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            showToast(data.message || `Successfully unlocked ${seatIds.length} seat(s) back to Available.`, 'success');
+
+            // Update in-memory seatsData
+            seatIds.forEach(id => {
+                const s = seatManager.seatsData.find(x => x.id === id);
+                if (s) {
+                    s.status = 'AVAILABLE';
+                    s.admin_reserve_reason = null;
+                }
+            });
+
+            // Update KPI counters
+            const availEl = document.getElementById('kpiAvailableSeats');
+            const lockedEl = document.getElementById('kpiAdminLockedSeats');
+            if (availEl) availEl.textContent = parseInt(availEl.textContent) + seatIds.length;
+            if (lockedEl) lockedEl.textContent = Math.max(0, parseInt(lockedEl.textContent) - seatIds.length);
+
+            seatManager.selectedForUnlock.clear();
+            seatManager.render();
+            seatManager.updateToolbarUI();
+        } else {
+            showToast(data.message || 'Failed to unlock seats.', 'danger');
+        }
+    } catch (err) {
+        showToast('Network error while unlocking seats.', 'danger');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-lock-open"></i> Unlock Selected (<span id="unlockCountBadge">${seatManager.selectedForUnlock.size}</span>)`;
+    }
+}
+</script>
+{% endif %}
+{% endblock %}
