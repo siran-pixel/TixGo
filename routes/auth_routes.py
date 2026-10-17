@@ -51,7 +51,7 @@ def signup():
             return render_template("signup.html"), 400
 
         if not validate_phone(phone):
-            msg = "Please enter a valid 10-15 digit phone number."
+            msg = "Please enter a valid 10-digit phone number."
             if request.is_json:
                 return jsonify({"success": False, "message": msg}), 400
             flash(msg, "danger")

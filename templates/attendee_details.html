@@ -62,7 +62,8 @@
                                         <div class="form-row">
                                             <div class="form-group col-half">
                                                 <label for="phone_{{ seat.id }}"><i class="fa-solid fa-phone"></i> Phone Number *</label>
-                                                <input type="tel" id="phone_{{ seat.id }}" name="attendee_phone_{{ seat.id }}" class="form-control" placeholder="10-digit mobile" required value="{% if loop.first and current_user %}{{ current_user.phone }}{% endif %}">
+                                                <input type="tel" id="phone_{{ seat.id }}" name="attendee_phone_{{ seat.id }}" class="form-control attendee-phone-input" placeholder="10-digit mobile" pattern="[0-9]{10}" maxlength="10" minlength="10" title="Please enter exactly 10 digits" required value="{% if loop.first and current_user %}{{ current_user.phone }}{% endif %}">
+                                                <small class="form-hint" style="color: #64748b; font-size: 0.75rem;">Must be exactly 10 digits.</small>
                                             </div>
                                             <div class="form-group col-half">
                                                 <label for="city_{{ seat.id }}"><i class="fa-solid fa-city"></i> City *</label>
@@ -122,4 +123,21 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.attendee-phone-input').forEach(input => {
+        input.addEventListener('input', () => {
+            input.value = input.value.replace(/\D/g, '').slice(0, 10);
+            if (input.value.length === 10) {
+                input.setCustomValidity('');
+            } else {
+                input.setCustomValidity('Phone number must be exactly 10 digits.');
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

@@ -98,3 +98,35 @@ def test_forgot_and_reset_password_flow(client, app):
     )
     assert login_res.status_code == 200
     assert login_res.get_json()["success"] is True
+
+
+def test_signup_invalid_phone_digits(client):
+    """Test signing up with less than 10 or more than 10 digits fails."""
+    # Less than 10 digits (9 digits)
+    res_short = client.post(
+        "/signup",
+        json={
+            "full_name": "Short Phone",
+            "email": "shortphone@example.com",
+            "password": "Password123",
+            "confirm_password": "Password123",
+            "phone": "987654321",
+        },
+    )
+    assert res_short.status_code == 400
+    assert "10-digit phone number" in res_short.get_json()["message"]
+
+    # More than 10 digits (11 digits)
+    res_long = client.post(
+        "/signup",
+        json={
+            "full_name": "Long Phone",
+            "email": "longphone@example.com",
+            "password": "Password123",
+            "confirm_password": "Password123",
+            "phone": "98765432101",
+        },
+    )
+    assert res_long.status_code == 400
+    assert "10-digit phone number" in res_long.get_json()["message"]
+

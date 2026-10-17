@@ -133,19 +133,19 @@
                                     <title>Grand Terrace • INR 6,283</title>
                                 </path>
 
-                                <!-- C STAND (Inactive, 68° to 88°) -->
+                                <!-- C STAND (Active, 68° to 88°) -->
                                 <path d="M 844.0 289.4 A 425 425 0 0 1 874.8 435.2 L 744.7 439.7 A 295 295 0 0 0 723.4 338.4 Z" 
-                                      class="stadium-sector stand-inactive sector-c-stand" data-stand="C Stand">
-                                    <title>C Stand (Sold Out)</title>
+                                      class="stadium-sector stand-active sector-c-stand" data-stand="C Stand" onclick="selectCricketSector('C Stand')">
+                                    <title>C Stand • INR 3,850</title>
                                 </path>
-                                <text x="778" y="380" class="svg-sector-label-gray">C STAND</text>
+                                <text x="778" y="380" class="svg-sector-label-active">C STAND</text>
 
-                                <!-- E STAND (Inactive Inner/Mid, 88° to 108°) -->
+                                <!-- E STAND (Active Inner/Mid, 88° to 108°) -->
                                 <path d="M 874.8 464.8 A 425 425 0 0 1 844.0 610.6 L 723.4 561.6 A 295 295 0 0 0 744.7 460.3 Z" 
-                                      class="stadium-sector stand-inactive sector-e-stand" data-stand="E Stand">
-                                    <title>E Stand (Sold Out)</title>
+                                      class="stadium-sector stand-active sector-e-stand" data-stand="E Stand" onclick="selectCricketSector('E Stand')">
+                                    <title>E Stand • INR 4,500</title>
                                 </path>
-                                <text x="778" y="525" class="svg-sector-label-gray">E STAND</text>
+                                <text x="778" y="525" class="svg-sector-label-active">E STAND</text>
 
                                 <!-- H UPPER (East / South-East, 68° to 125° Outer) -->
                                 <path d="M 835.2 629.6 A 425 425 0 0 1 693.7 798.1 L 619.1 691.6 A 295 295 0 0 0 717.3 574.8 Z" 
@@ -153,28 +153,31 @@
                                     <title>H Upper • INR 4,338</title>
                                 </path>
 
-                                <!-- SOUTH-EAST INACTIVE BLOCKS (M4, M3, M2, M1, P1) -->
+                                <!-- SOUTH-EAST BLOCKS (M4, M3, M2, M1, P1) - ACTIVE FOR BOOKING -->
                                 <path d="M 678.0 810.0 A 425 425 0 0 1 540.0 865.0 L 512.4 741.0 A 295 295 0 0 0 608.2 702.8 Z" 
-                                      class="stadium-sector stand-inactive sector-m4" data-stand="M4 Stand">
+                                      class="stadium-sector stand-active sector-m4" data-stand="M3 / M4" onclick="selectCricketSector('M3 / M4')">
+                                    <title>M3 / M4 Stand • INR 3,950</title>
                                 </path>
-                                <text x="595" y="780" class="svg-sector-label-gray">M3 / M4</text>
+                                <text x="595" y="780" class="svg-sector-label-active">M3 / M4</text>
 
                                 <path d="M 525.0 868.0 A 425 425 0 0 1 375.0 868.0 L 398.0 743.0 A 295 295 0 0 0 502.0 743.0 Z" 
                                       class="stadium-sector stand-active sector-p-corp" data-stand="P Corp" onclick="selectCricketSector('P Corp')">
                                     <title>P Corp / P Terrace • INR 13,464 - INR 34,407</title>
                                 </path>
 
-                                <!-- GR VISHWANATH STAND P2 (Inactive, 235° to 260°) -->
+                                <!-- GR VISHWANATH STAND P2 (Active, 235° to 260°) -->
                                 <path d="M 360.0 865.0 A 425 425 0 0 1 222.0 810.0 L 291.8 702.8 A 295 295 0 0 0 387.6 741.0 Z" 
-                                      class="stadium-sector stand-inactive sector-p2-vishwanath" data-stand="GR Vishwanath Stand P2">
+                                      class="stadium-sector stand-active sector-p2-vishwanath" data-stand="GR Vishwanath Stand P2" onclick="selectCricketSector('GR Vishwanath Stand P2')">
+                                    <title>GR Vishwanath Stand P2 • INR 5,450</title>
                                 </path>
-                                <text x="315" y="780" class="svg-sector-label-gray" style="font-size: 8px;">GR VISHWANATH STAND P2</text>
+                                <text x="315" y="780" class="svg-sector-label-active" style="font-size: 8px;">GR VISHWANATH P2</text>
 
-                                <!-- P1 ANNEXE STAND (Inactive, 260° to 280°) -->
+                                <!-- P1 ANNEXE STAND (Active, 260° to 280°) -->
                                 <path d="M 206.3 798.1 A 425 425 0 0 1 64.8 629.6 L 182.7 574.8 A 295 295 0 0 0 280.9 691.6 Z" 
-                                      class="stadium-sector stand-inactive sector-p1-annexe" data-stand="P1 Annexe Stand">
+                                      class="stadium-sector stand-active sector-p1-annexe" data-stand="P1 Annexe Stand" onclick="selectCricketSector('P1 Annexe Stand')">
+                                    <title>P1 Annexe Stand • INR 4,850</title>
                                 </path>
-                                <text x="180" y="700" class="svg-sector-label-gray" style="font-size: 8.5px;">P1 ANNEXE STAND</text>
+                                <text x="180" y="700" class="svg-sector-label-active" style="font-size: 8.5px;">P1 ANNEXE</text>
 
                                 <!-- STAND F (South-West / West, 220° to 255°) -->
                                 <path d="M 56.0 610.6 A 425 425 0 0 1 25.2 464.8 L 155.3 460.3 A 295 295 0 0 0 176.6 561.6 Z" 
@@ -188,11 +191,12 @@
                                     <title>E Executive • INR 6,732</title>
                                 </path>
 
-                                <!-- P3 BLOCK 2 (Inactive, West-North-West, 295° to 312°) -->
+                                <!-- P3 BLOCK 2 (Active, West-North-West, 295° to 312°) -->
                                 <path d="M 64.8 270.4 A 425 425 0 0 1 125.0 175.0 L 224.2 258.9 A 295 295 0 0 0 182.7 325.2 Z" 
-                                      class="stadium-sector stand-inactive sector-p3-block2" data-stand="P3 Block 2">
+                                      class="stadium-sector stand-active sector-p3-block2" data-stand="P3 Block 2" onclick="selectCricketSector('P3 Block 2')">
+                                    <title>P3 Block 2 • INR 4,950</title>
                                 </path>
-                                <text x="135" y="270" class="svg-sector-label-gray" style="font-size: 9px; transform: rotate(-55deg 135 270);">P3 BLOCK 2</text>
+                                <text x="135" y="270" class="svg-sector-label-active" style="font-size: 9px; transform: rotate(-55deg 135 270);">P3 BLOCK 2</text>
 
                                 <!-- A STAND (North-West, 312° to 330°) -->
                                 <path d="M 135.0 160.0 A 425 425 0 0 1 245.0 75.0 L 307.7 189.6 A 295 295 0 0 0 231.2 248.5 Z" 
@@ -207,7 +211,7 @@
                                 </path>
 
                                 <!-- ============================================================= -->
-                                <!-- INNER RING STANDS (Radius 165 to 285) -->
+                                <!-- INNER RING STANDS (Radius 165 to 285) - ALL ACTIVE FOR BOOKING -->
                                 <!-- ============================================================= -->
 
                                 <!-- D CORPORATE (North-West Inner Ring, 295° to 350°) -->
@@ -216,34 +220,39 @@
                                     <title>D Corporate • INR 5,162</title>
                                 </path>
 
-                                <!-- BLOCK 1 & BLOCK 2 (East Inner, Inactive) -->
+                                <!-- BLOCK 1 & BLOCK 2 (East Inner, Active) -->
                                 <path d="M 723.4 338.4 A 285 285 0 0 1 735.0 450.0 L 615.0 450.0 A 165 165 0 0 0 608.3 385.4 Z" 
-                                      class="stadium-sector stand-inactive sector-block-1" data-stand="Block 1">
+                                      class="stadium-sector stand-active sector-block-1" data-stand="Block 1" onclick="selectCricketSector('Block 1')">
+                                    <title>Block 1 • INR 4,150</title>
                                 </path>
-                                <text x="655" y="420" class="svg-sector-label-gray" style="font-size: 8.5px;">BLOCK 1</text>
+                                <text x="655" y="420" class="svg-sector-label-active" style="font-size: 8.5px;">BLOCK 1</text>
 
                                 <path d="M 735.0 460.0 A 285 285 0 0 1 715.0 570.0 L 603.4 519.4 A 165 165 0 0 0 615.0 460.0 Z" 
-                                      class="stadium-sector stand-inactive sector-block-2" data-stand="Block 2">
+                                      class="stadium-sector stand-active sector-block-2" data-stand="Block 2" onclick="selectCricketSector('Block 2')">
+                                    <title>Block 2 • INR 4,150</title>
                                 </path>
-                                <text x="650" y="500" class="svg-sector-label-gray" style="font-size: 8.5px;">BLOCK 2</text>
+                                <text x="650" y="500" class="svg-sector-label-active" style="font-size: 8.5px;">BLOCK 2</text>
 
-                                <!-- M4, M3, M2, M1 INNER SECTORS (Inactive) -->
+                                <!-- M4, M3, M2, M1 INNER SECTORS (Active) -->
                                 <path d="M 705.0 580.0 A 285 285 0 0 1 635.0 675.0 L 557.3 580.4 A 165 165 0 0 0 597.8 525.2 Z" 
-                                      class="stadium-sector stand-inactive sector-m-inner">
+                                      class="stadium-sector stand-active sector-m-inner" data-stand="M4 Stand" onclick="selectCricketSector('M4 Stand')">
+                                    <title>M4 / M3 Inner • INR 3,950</title>
                                 </path>
-                                <text x="615" y="605" class="svg-sector-label-gray" style="font-size: 8px;">M4</text>
-                                <text x="575" y="640" class="svg-sector-label-gray" style="font-size: 8px;">M3</text>
+                                <text x="615" y="605" class="svg-sector-label-active" style="font-size: 8px;">M4</text>
+                                <text x="575" y="640" class="svg-sector-label-active" style="font-size: 8px;">M3</text>
 
                                 <path d="M 625.0 685.0 A 285 285 0 0 1 520.0 730.0 L 490.6 612.4 A 165 165 0 0 0 551.4 586.6 Z" 
-                                      class="stadium-sector stand-inactive sector-m-inner-south">
+                                      class="stadium-sector stand-active sector-m-inner-south" data-stand="M2 / M1" onclick="selectCricketSector('M2 / M1')">
+                                    <title>M2 / M1 Inner • INR 3,750</title>
                                 </path>
-                                <text x="535" y="680" class="svg-sector-label-gray" style="font-size: 8px;">M2</text>
-                                <text x="495" y="695" class="svg-sector-label-gray" style="font-size: 8px;">M1</text>
+                                <text x="535" y="680" class="svg-sector-label-active" style="font-size: 8px;">M2</text>
+                                <text x="495" y="695" class="svg-sector-label-active" style="font-size: 8px;">M1</text>
 
                                 <path d="M 480.0 733.0 A 285 285 0 0 1 360.0 715.0 L 398.0 603.5 A 165 165 0 0 0 467.5 613.9 Z" 
-                                      class="stadium-sector stand-inactive sector-p1-inner">
+                                      class="stadium-sector stand-active sector-p1-inner" data-stand="P1 Stand" onclick="selectCricketSector('P1 Stand')">
+                                    <title>P1 Stand • INR 4,200</title>
                                 </path>
-                                <text x="430" y="695" class="svg-sector-label-gray" style="font-size: 8px;">P1</text>
+                                <text x="430" y="695" class="svg-sector-label-active" style="font-size: 8px;">P1</text>
                             </g>
 
                             <!-- ============================================================= -->
@@ -266,69 +275,141 @@
                             <!-- ============================================================= -->
                             <g class="floating-pills-group" id="floatingPillsGroup">
                                 <!-- PLATINUM LOUNGE -->
-                                <g class="floating-badge-pill" transform="translate(425, 42)" onclick="selectCricketSector('Platinum Lounge')">
-                                    <rect x="-48" y="-12" width="96" height="24" rx="12" fill="#ffffff" filter="url(#pillShadow)" />
-                                    <text x="0" y="4" class="pill-badge-price">INR21,691</text>
+                                <g class="floating-badge-pill" data-stand="Platinum Lounge" transform="translate(425, 42)" onclick="selectCricketSector('Platinum Lounge')">
+                                    <g class="pill-body">
+                                        <rect x="-48" y="-12" width="96" height="24" rx="12" fill="#ffffff" filter="url(#pillShadow)" />
+                                        <text x="0" y="4" class="pill-badge-price">INR21,691</text>
+                                    </g>
                                 </g>
 
                                 <!-- GRAND TERRACE -->
-                                <g class="floating-badge-pill" transform="translate(680, 115)" onclick="selectCricketSector('Grand Terrace')">
-                                    <rect x="-48" y="-18" width="96" height="34" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
-                                    <text x="0" y="-3" class="pill-badge-price">INR6,283</text>
-                                    <text x="0" y="9" class="pill-badge-title">GRAND TERRACE</text>
+                                <g class="floating-badge-pill" data-stand="Grand Terrace" transform="translate(680, 115)" onclick="selectCricketSector('Grand Terrace')">
+                                    <g class="pill-body">
+                                        <rect x="-48" y="-18" width="96" height="34" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
+                                        <text x="0" y="-3" class="pill-badge-price">INR6,283</text>
+                                        <text x="0" y="9" class="pill-badge-title">GRAND TERRACE</text>
+                                    </g>
                                 </g>
 
                                 <!-- H UPPER -->
-                                <g class="floating-badge-pill" transform="translate(775, 415)" onclick="selectCricketSector('H Upper')">
-                                    <rect x="-48" y="-18" width="96" height="34" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
-                                    <circle cx="-34" cy="-3" r="5.5" fill="#16a34a" />
-                                    <text x="-34" y="-0.5" fill="#ffffff" font-size="7" font-weight="900" text-anchor="middle">$</text>
-                                    <text x="4" y="-3" class="pill-badge-price">INR4,338</text>
-                                    <text x="0" y="9" class="pill-badge-title">H UPPER</text>
+                                <g class="floating-badge-pill" data-stand="H Upper" transform="translate(775, 415)" onclick="selectCricketSector('H Upper')">
+                                    <g class="pill-body">
+                                        <rect x="-48" y="-18" width="96" height="34" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
+                                        <circle cx="-34" cy="-3" r="5.5" fill="#16a34a" />
+                                        <text x="-34" y="-0.5" fill="#ffffff" font-size="7" font-weight="900" text-anchor="middle" pointer-events="none">$</text>
+                                        <text x="4" y="-3" class="pill-badge-price">INR4,338</text>
+                                        <text x="0" y="9" class="pill-badge-title">H UPPER</text>
+                                    </g>
                                 </g>
 
                                 <!-- A STAND -->
-                                <g class="floating-badge-pill" transform="translate(230, 215)" onclick="selectCricketSector('A Stand')">
-                                    <rect x="-42" y="-18" width="84" height="34" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
-                                    <text x="0" y="-3" class="pill-badge-price">INR4,636</text>
-                                    <text x="0" y="9" class="pill-badge-title">A STAND</text>
+                                <g class="floating-badge-pill" data-stand="A Stand" transform="translate(230, 215)" onclick="selectCricketSector('A Stand')">
+                                    <g class="pill-body">
+                                        <rect x="-42" y="-18" width="84" height="34" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
+                                        <text x="0" y="-3" class="pill-badge-price">INR4,636</text>
+                                        <text x="0" y="9" class="pill-badge-title">A STAND</text>
+                                    </g>
                                 </g>
 
                                 <!-- B STAND -->
-                                <g class="floating-badge-pill" transform="translate(330, 225)" onclick="selectCricketSector('B Stand')">
-                                    <rect x="-44" y="-18" width="88" height="34" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
-                                    <circle cx="-31" cy="-3" r="5" fill="#ef4444" />
-                                    <text x="-31" y="0.5" fill="#ffffff" font-size="7" text-anchor="middle">🔥</text>
-                                    <text x="4" y="-3" class="pill-badge-price">INR4,488</text>
-                                    <text x="0" y="9" class="pill-badge-title">B STAND</text>
+                                <g class="floating-badge-pill" data-stand="B Stand" transform="translate(330, 225)" onclick="selectCricketSector('B Stand')">
+                                    <g class="pill-body">
+                                        <rect x="-44" y="-18" width="88" height="34" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
+                                        <circle cx="-31" cy="-3" r="5" fill="#ef4444" />
+                                        <text x="-31" y="0.5" fill="#ffffff" font-size="7" text-anchor="middle" pointer-events="none">🔥</text>
+                                        <text x="4" y="-3" class="pill-badge-price">INR4,488</text>
+                                        <text x="0" y="9" class="pill-badge-title">B STAND</text>
+                                    </g>
                                 </g>
 
                                 <!-- D CORPORATE -->
-                                <g class="floating-badge-pill" transform="translate(325, 335)" onclick="selectCricketSector('D Corporate')">
-                                    <rect x="-48" y="-18" width="96" height="34" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
-                                    <circle cx="-34" cy="-3" r="5" fill="#7c3aed" />
-                                    <text x="3" y="-3" class="pill-badge-price">INR5,162</text>
-                                    <text x="0" y="9" class="pill-badge-title">D CORPORATE</text>
+                                <g class="floating-badge-pill" data-stand="D Corporate" transform="translate(325, 335)" onclick="selectCricketSector('D Corporate')">
+                                    <g class="pill-body">
+                                        <rect x="-48" y="-18" width="96" height="34" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
+                                        <circle cx="-34" cy="-3" r="5" fill="#7c3aed" />
+                                        <text x="3" y="-3" class="pill-badge-price">INR5,162</text>
+                                        <text x="0" y="9" class="pill-badge-title">D CORPORATE</text>
+                                    </g>
                                 </g>
 
                                 <!-- E EXECUTIVE -->
-                                <g class="floating-badge-pill" transform="translate(145, 470)" onclick="selectCricketSector('E Executive')">
-                                    <rect x="-46" y="-12" width="92" height="24" rx="12" fill="#ffffff" filter="url(#pillShadow)" />
-                                    <text x="0" y="4" class="pill-badge-price">INR6,732</text>
+                                <g class="floating-badge-pill" data-stand="E Executive" transform="translate(145, 470)" onclick="selectCricketSector('E Executive')">
+                                    <g class="pill-body">
+                                        <rect x="-46" y="-12" width="92" height="24" rx="12" fill="#ffffff" filter="url(#pillShadow)" />
+                                        <text x="0" y="4" class="pill-badge-price">INR6,732</text>
+                                    </g>
                                 </g>
 
                                 <!-- STAND F -->
-                                <g class="floating-badge-pill" transform="translate(205, 650)" onclick="selectCricketSector('Stand F')">
-                                    <rect x="-45" y="-18" width="90" height="34" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
-                                    <text x="0" y="-3" class="pill-badge-price">INR5,982</text>
-                                    <text x="0" y="9" class="pill-badge-title">STAND F</text>
+                                <g class="floating-badge-pill" data-stand="Stand F" transform="translate(205, 650)" onclick="selectCricketSector('Stand F')">
+                                    <g class="pill-body">
+                                        <rect x="-45" y="-18" width="90" height="34" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
+                                        <text x="0" y="-3" class="pill-badge-price">INR5,982</text>
+                                        <text x="0" y="9" class="pill-badge-title">STAND F</text>
+                                    </g>
                                 </g>
 
                                 <!-- P TERRACE & P CORP -->
-                                <g class="floating-badge-pill" transform="translate(450, 850)" onclick="selectCricketSector('P Corp')">
-                                    <rect x="-56" y="-18" width="112" height="36" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
-                                    <text x="0" y="-4" class="pill-badge-price">INR13,464</text>
-                                    <text x="0" y="9" class="pill-badge-title">P TERRACE / P CORP</text>
+                                <g class="floating-badge-pill" data-stand="P Corp" transform="translate(450, 850)" onclick="selectCricketSector('P Corp')">
+                                    <g class="pill-body">
+                                        <rect x="-56" y="-18" width="112" height="36" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
+                                        <text x="0" y="-4" class="pill-badge-price">INR13,464</text>
+                                        <text x="0" y="9" class="pill-badge-title">P TERRACE / P CORP</text>
+                                    </g>
+                                </g>
+
+                                <!-- C STAND -->
+                                <g class="floating-badge-pill" data-stand="C Stand" transform="translate(815, 330)" onclick="selectCricketSector('C Stand')">
+                                    <g class="pill-body">
+                                        <rect x="-42" y="-14" width="84" height="28" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
+                                        <text x="0" y="-1" class="pill-badge-price">INR3,850</text>
+                                        <text x="0" y="9" class="pill-badge-title">C STAND</text>
+                                    </g>
+                                </g>
+
+                                <!-- E STAND -->
+                                <g class="floating-badge-pill" data-stand="E Stand" transform="translate(815, 540)" onclick="selectCricketSector('E Stand')">
+                                    <g class="pill-body">
+                                        <rect x="-42" y="-14" width="84" height="28" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
+                                        <text x="0" y="-1" class="pill-badge-price">INR4,500</text>
+                                        <text x="0" y="9" class="pill-badge-title">E STAND</text>
+                                    </g>
+                                </g>
+
+                                <!-- P3 BLOCK 2 -->
+                                <g class="floating-badge-pill" data-stand="P3 Block 2" transform="translate(105, 195)" onclick="selectCricketSector('P3 Block 2')">
+                                    <g class="pill-body">
+                                        <rect x="-46" y="-14" width="92" height="28" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
+                                        <text x="0" y="-1" class="pill-badge-price">INR4,950</text>
+                                        <text x="0" y="9" class="pill-badge-title">P3 BLOCK 2</text>
+                                    </g>
+                                </g>
+
+                                <!-- GR VISHWANATH P2 -->
+                                <g class="floating-badge-pill" data-stand="GR Vishwanath Stand P2" transform="translate(285, 840)" onclick="selectCricketSector('GR Vishwanath Stand P2')">
+                                    <g class="pill-body">
+                                        <rect x="-50" y="-14" width="100" height="28" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
+                                        <text x="0" y="-1" class="pill-badge-price">INR5,450</text>
+                                        <text x="0" y="9" class="pill-badge-title">GR VISHWANATH</text>
+                                    </g>
+                                </g>
+
+                                <!-- BLOCK 1 / 2 -->
+                                <g class="floating-badge-pill" data-stand="Block 1" transform="translate(685, 395)" onclick="selectCricketSector('Block 1')">
+                                    <g class="pill-body">
+                                        <rect x="-42" y="-14" width="84" height="28" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
+                                        <text x="0" y="-1" class="pill-badge-price">INR4,150</text>
+                                        <text x="0" y="9" class="pill-badge-title">BLOCK 1</text>
+                                    </g>
+                                </g>
+
+                                <!-- M3 / M4 -->
+                                <g class="floating-badge-pill" data-stand="M3 / M4" transform="translate(620, 770)" onclick="selectCricketSector('M3 / M4')">
+                                    <g class="pill-body">
+                                        <rect x="-42" y="-14" width="84" height="28" rx="14" fill="#ffffff" filter="url(#pillShadow)" />
+                                        <text x="0" y="-1" class="pill-badge-price">INR3,950</text>
+                                        <text x="0" y="9" class="pill-badge-title">M3 / M4</text>
+                                    </g>
                                 </g>
                             </g>
                         </svg>
@@ -619,6 +700,293 @@
                                     <div class="card-unit-price">INR 34,407 / ticket</div>
                                     <div class="card-rating-badge">9.9 Luxury</div>
                                     <button type="button" class="card-select-btn" onclick="event.stopPropagation(); selectCricketSector('P Corp')">
+                                        Select
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- C STAND -->
+                        <div class="cricket-ticket-card" id="cricket-card-c-stand" data-stand="C Stand" onclick="selectCricketSector('C Stand')">
+                            <div class="card-main-row">
+                                <div class="card-left-info">
+                                    <h4 class="card-stand-name">C Stand</h4>
+                                    <div class="card-row-info"><i class="fa-solid fa-location-dot" style="color: #94a3b8; font-size: 0.75rem; margin-right: 4px;"></i>Row C &bull; East Stand</div>
+                                    <ul class="card-features-list">
+                                        <li><i class="fa-solid fa-users"></i> <span class="card-qty-label">2 tickets together</span></li>
+                                        <li><i class="fa-regular fa-eye"></i> Clear view of pitch &amp; outfield</li>
+                                        <li><i class="fa-solid fa-bolt"></i> Instant download</li>
+                                    </ul>
+                                    <div class="card-tag-pill tag-best-price">
+                                        <i class="fa-solid fa-tag"></i> Best value
+                                    </div>
+                                </div>
+                                <div class="card-right-info">
+                                    <div class="card-price-value" data-base-price="3850">INR 7,700</div>
+                                    <div class="card-price-calc" data-base-price="3850">(2 &times; INR 3,850)</div>
+                                    <div class="card-unit-price">INR 3,850 / ticket</div>
+                                    <div class="card-rating-badge">8.4 Great</div>
+                                    <button type="button" class="card-select-btn" onclick="event.stopPropagation(); selectCricketSector('C Stand')">
+                                        Select
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- E STAND -->
+                        <div class="cricket-ticket-card" id="cricket-card-e-stand" data-stand="E Stand" onclick="selectCricketSector('E Stand')">
+                            <div class="card-main-row">
+                                <div class="card-left-info">
+                                    <h4 class="card-stand-name">E Stand</h4>
+                                    <div class="card-row-info"><i class="fa-solid fa-location-dot" style="color: #94a3b8; font-size: 0.75rem; margin-right: 4px;"></i>Row E &bull; Mid Tier Elevation</div>
+                                    <ul class="card-features-list">
+                                        <li><i class="fa-solid fa-users"></i> <span class="card-qty-label">2 tickets together</span></li>
+                                        <li><i class="fa-regular fa-eye"></i> Clear view of wicket &amp; boundary</li>
+                                    </ul>
+                                    <div class="card-tag-pill tag-best-price">
+                                        <i class="fa-solid fa-fire"></i> Popular
+                                    </div>
+                                </div>
+                                <div class="card-right-info">
+                                    <div class="card-price-value" data-base-price="4500">INR 9,000</div>
+                                    <div class="card-price-calc" data-base-price="4500">(2 &times; INR 4,500)</div>
+                                    <div class="card-unit-price">INR 4,500 / ticket</div>
+                                    <div class="card-rating-badge">8.6 Great</div>
+                                    <button type="button" class="card-select-btn" onclick="event.stopPropagation(); selectCricketSector('E Stand')">
+                                        Select
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BLOCK 1 -->
+                        <div class="cricket-ticket-card" id="cricket-card-block-1" data-stand="Block 1" onclick="selectCricketSector('Block 1')">
+                            <div class="card-main-row">
+                                <div class="card-left-info">
+                                    <h4 class="card-stand-name">Block 1</h4>
+                                    <div class="card-row-info"><i class="fa-solid fa-location-dot" style="color: #94a3b8; font-size: 0.75rem; margin-right: 4px;"></i>Row 1 &bull; Inner Ring Stand</div>
+                                    <ul class="card-features-list">
+                                        <li><i class="fa-solid fa-users"></i> <span class="card-qty-label">2 tickets together</span></li>
+                                        <li><i class="fa-regular fa-eye"></i> Close-up Pitch &amp; Boundary Action</li>
+                                    </ul>
+                                    <div class="card-tag-pill tag-best-deal">
+                                        <i class="fa-solid fa-star"></i> Pitch view
+                                    </div>
+                                </div>
+                                <div class="card-right-info">
+                                    <div class="card-price-value" data-base-price="4150">INR 8,300</div>
+                                    <div class="card-price-calc" data-base-price="4150">(2 &times; INR 4,150)</div>
+                                    <div class="card-unit-price">INR 4,150 / ticket</div>
+                                    <div class="card-rating-badge">8.2 Great</div>
+                                    <button type="button" class="card-select-btn" onclick="event.stopPropagation(); selectCricketSector('Block 1')">
+                                        Select
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BLOCK 2 -->
+                        <div class="cricket-ticket-card" id="cricket-card-block-2" data-stand="Block 2" onclick="selectCricketSector('Block 2')">
+                            <div class="card-main-row">
+                                <div class="card-left-info">
+                                    <h4 class="card-stand-name">Block 2</h4>
+                                    <div class="card-row-info"><i class="fa-solid fa-location-dot" style="color: #94a3b8; font-size: 0.75rem; margin-right: 4px;"></i>Row 2 &bull; East Inner Tier</div>
+                                    <ul class="card-features-list">
+                                        <li><i class="fa-solid fa-users"></i> <span class="card-qty-label">2 tickets together</span></li>
+                                        <li><i class="fa-regular fa-eye"></i> Clear Sightlines &amp; Fast Entry</li>
+                                    </ul>
+                                    <div class="card-tag-pill tag-selling-fast">
+                                        <i class="fa-solid fa-fire"></i> Selling fast
+                                    </div>
+                                </div>
+                                <div class="card-right-info">
+                                    <div class="card-price-value" data-base-price="4150">INR 8,300</div>
+                                    <div class="card-price-calc" data-base-price="4150">(2 &times; INR 4,150)</div>
+                                    <div class="card-unit-price">INR 4,150 / ticket</div>
+                                    <div class="card-rating-badge">8.3 Great</div>
+                                    <button type="button" class="card-select-btn" onclick="event.stopPropagation(); selectCricketSector('Block 2')">
+                                        Select
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- P3 BLOCK 2 -->
+                        <div class="cricket-ticket-card" id="cricket-card-p3-block-2" data-stand="P3 Block 2" onclick="selectCricketSector('P3 Block 2')">
+                            <div class="card-main-row">
+                                <div class="card-left-info">
+                                    <h4 class="card-stand-name">P3 Block 2</h4>
+                                    <div class="card-row-info"><i class="fa-solid fa-location-dot" style="color: #94a3b8; font-size: 0.75rem; margin-right: 4px;"></i>Row P3 &bull; North-West Outer</div>
+                                    <ul class="card-features-list">
+                                        <li><i class="fa-solid fa-users"></i> <span class="card-qty-label">2 tickets together</span></li>
+                                        <li><i class="fa-regular fa-eye"></i> Elevated Sightline &amp; Great View</li>
+                                    </ul>
+                                    <div class="card-tag-pill tag-best-price">
+                                        <i class="fa-solid fa-thumbs-up"></i> Great view
+                                    </div>
+                                </div>
+                                <div class="card-right-info">
+                                    <div class="card-price-value" data-base-price="4950">INR 9,900</div>
+                                    <div class="card-price-calc" data-base-price="4950">(2 &times; INR 4,950)</div>
+                                    <div class="card-unit-price">INR 4,950 / ticket</div>
+                                    <div class="card-rating-badge">8.8 Great</div>
+                                    <button type="button" class="card-select-btn" onclick="event.stopPropagation(); selectCricketSector('P3 Block 2')">
+                                        Select
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- P1 ANNEXE STAND -->
+                        <div class="cricket-ticket-card" id="cricket-card-p1-annexe-stand" data-stand="P1 Annexe Stand" onclick="selectCricketSector('P1 Annexe Stand')">
+                            <div class="card-main-row">
+                                <div class="card-left-info">
+                                    <h4 class="card-stand-name">P1 Annexe Stand</h4>
+                                    <div class="card-row-info"><i class="fa-solid fa-location-dot" style="color: #94a3b8; font-size: 0.75rem; margin-right: 4px;"></i>Row P1 &bull; South-West Annexe</div>
+                                    <ul class="card-features-list">
+                                        <li><i class="fa-solid fa-users"></i> <span class="card-qty-label">2 tickets together</span></li>
+                                        <li><i class="fa-regular fa-eye"></i> Annexe View &amp; Easy Entry</li>
+                                    </ul>
+                                    <div class="card-tag-pill tag-best-deal">
+                                        <i class="fa-solid fa-bookmark"></i> Annexe Stand
+                                    </div>
+                                </div>
+                                <div class="card-right-info">
+                                    <div class="card-price-value" data-base-price="4850">INR 9,700</div>
+                                    <div class="card-price-calc" data-base-price="4850">(2 &times; INR 4,850)</div>
+                                    <div class="card-unit-price">INR 4,850 / ticket</div>
+                                    <div class="card-rating-badge">8.5 Great</div>
+                                    <button type="button" class="card-select-btn" onclick="event.stopPropagation(); selectCricketSector('P1 Annexe Stand')">
+                                        Select
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GR VISHWANATH STAND P2 -->
+                        <div class="cricket-ticket-card" id="cricket-card-gr-vishwanath-stand-p2" data-stand="GR Vishwanath Stand P2" onclick="selectCricketSector('GR Vishwanath Stand P2')">
+                            <div class="card-main-row">
+                                <div class="card-left-info">
+                                    <h4 class="card-stand-name">GR Vishwanath Stand P2</h4>
+                                    <div class="card-row-info"><i class="fa-solid fa-location-dot" style="color: #94a3b8; font-size: 0.75rem; margin-right: 4px;"></i>Row P2 &bull; South-West Pavilion Tier</div>
+                                    <ul class="card-features-list">
+                                        <li><i class="fa-solid fa-users"></i> <span class="card-qty-label">2 tickets together</span></li>
+                                        <li><i class="fa-regular fa-eye"></i> Prime Boundary Action View</li>
+                                    </ul>
+                                    <div class="card-tag-pill tag-best-deal">
+                                        <i class="fa-solid fa-crown"></i> Pavilion View
+                                    </div>
+                                </div>
+                                <div class="card-right-info">
+                                    <div class="card-price-value" data-base-price="5450">INR 10,900</div>
+                                    <div class="card-price-calc" data-base-price="5450">(2 &times; INR 5,450)</div>
+                                    <div class="card-unit-price">INR 5,450 / ticket</div>
+                                    <div class="card-rating-badge">9.1 Amazing</div>
+                                    <button type="button" class="card-select-btn" onclick="event.stopPropagation(); selectCricketSector('GR Vishwanath Stand P2')">
+                                        Select
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- M3 / M4 -->
+                        <div class="cricket-ticket-card" id="cricket-card-m3-m4" data-stand="M3 / M4" onclick="selectCricketSector('M3 / M4')">
+                            <div class="card-main-row">
+                                <div class="card-left-info">
+                                    <h4 class="card-stand-name">M3 / M4</h4>
+                                    <div class="card-row-info"><i class="fa-solid fa-location-dot" style="color: #94a3b8; font-size: 0.75rem; margin-right: 4px;"></i>Row M &bull; South-East Outer</div>
+                                    <ul class="card-features-list">
+                                        <li><i class="fa-solid fa-users"></i> <span class="card-qty-label">2 tickets together</span></li>
+                                        <li><i class="fa-regular fa-eye"></i> Clear view of pitch</li>
+                                    </ul>
+                                    <div class="card-tag-pill tag-best-price">
+                                        <i class="fa-solid fa-tag"></i> Value ticket
+                                    </div>
+                                </div>
+                                <div class="card-right-info">
+                                    <div class="card-price-value" data-base-price="3950">INR 7,900</div>
+                                    <div class="card-price-calc" data-base-price="3950">(2 &times; INR 3,950)</div>
+                                    <div class="card-unit-price">INR 3,950 / ticket</div>
+                                    <div class="card-rating-badge">8.0 Good</div>
+                                    <button type="button" class="card-select-btn" onclick="event.stopPropagation(); selectCricketSector('M3 / M4')">
+                                        Select
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- M4 STAND INNER -->
+                        <div class="cricket-ticket-card" id="cricket-card-m4-stand" data-stand="M4 Stand" onclick="selectCricketSector('M4 Stand')">
+                            <div class="card-main-row">
+                                <div class="card-left-info">
+                                    <h4 class="card-stand-name">M4 Stand</h4>
+                                    <div class="card-row-info"><i class="fa-solid fa-location-dot" style="color: #94a3b8; font-size: 0.75rem; margin-right: 4px;"></i>Row M4 &bull; Inner Ring Stand</div>
+                                    <ul class="card-features-list">
+                                        <li><i class="fa-solid fa-users"></i> <span class="card-qty-label">2 tickets together</span></li>
+                                        <li><i class="fa-regular fa-eye"></i> Inner Ring Seating &amp; Fast Access</li>
+                                    </ul>
+                                    <div class="card-tag-pill tag-best-price">
+                                        <i class="fa-solid fa-ticket"></i> Inner stand
+                                    </div>
+                                </div>
+                                <div class="card-right-info">
+                                    <div class="card-price-value" data-base-price="3950">INR 7,900</div>
+                                    <div class="card-price-calc" data-base-price="3950">(2 &times; INR 3,950)</div>
+                                    <div class="card-unit-price">INR 3,950 / ticket</div>
+                                    <div class="card-rating-badge">8.1 Good</div>
+                                    <button type="button" class="card-select-btn" onclick="event.stopPropagation(); selectCricketSector('M4 Stand')">
+                                        Select
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- M2 / M1 INNER -->
+                        <div class="cricket-ticket-card" id="cricket-card-m2-m1" data-stand="M2 / M1" onclick="selectCricketSector('M2 / M1')">
+                            <div class="card-main-row">
+                                <div class="card-left-info">
+                                    <h4 class="card-stand-name">M2 / M1</h4>
+                                    <div class="card-row-info"><i class="fa-solid fa-location-dot" style="color: #94a3b8; font-size: 0.75rem; margin-right: 4px;"></i>Row M2 &bull; South Inner Ring</div>
+                                    <ul class="card-features-list">
+                                        <li><i class="fa-solid fa-users"></i> <span class="card-qty-label">2 tickets together</span></li>
+                                        <li><i class="fa-regular fa-eye"></i> Budget-Friendly Seating</li>
+                                    </ul>
+                                    <div class="card-tag-pill tag-best-price">
+                                        <i class="fa-solid fa-tag"></i> Budget deal
+                                    </div>
+                                </div>
+                                <div class="card-right-info">
+                                    <div class="card-price-value" data-base-price="3750">INR 7,500</div>
+                                    <div class="card-price-calc" data-base-price="3750">(2 &times; INR 3,750)</div>
+                                    <div class="card-unit-price">INR 3,750 / ticket</div>
+                                    <div class="card-rating-badge">7.9 Good</div>
+                                    <button type="button" class="card-select-btn" onclick="event.stopPropagation(); selectCricketSector('M2 / M1')">
+                                        Select
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- P1 STAND -->
+                        <div class="cricket-ticket-card" id="cricket-card-p1-stand" data-stand="P1 Stand" onclick="selectCricketSector('P1 Stand')">
+                            <div class="card-main-row">
+                                <div class="card-left-info">
+                                    <h4 class="card-stand-name">P1 Stand</h4>
+                                    <div class="card-row-info"><i class="fa-solid fa-location-dot" style="color: #94a3b8; font-size: 0.75rem; margin-right: 4px;"></i>Row P1 &bull; South-West Inner Ring</div>
+                                    <ul class="card-features-list">
+                                        <li><i class="fa-solid fa-users"></i> <span class="card-qty-label">2 tickets together</span></li>
+                                        <li><i class="fa-regular fa-eye"></i> Close to Pitch &amp; Boundary</li>
+                                    </ul>
+                                    <div class="card-tag-pill tag-best-deal">
+                                        <i class="fa-solid fa-star"></i> Inner pitch view
+                                    </div>
+                                </div>
+                                <div class="card-right-info">
+                                    <div class="card-price-value" data-base-price="4200">INR 8,400</div>
+                                    <div class="card-price-calc" data-base-price="4200">(2 &times; INR 4,200)</div>
+                                    <div class="card-unit-price">INR 4,200 / ticket</div>
+                                    <div class="card-rating-badge">8.3 Great</div>
+                                    <button type="button" class="card-select-btn" onclick="event.stopPropagation(); selectCricketSector('P1 Stand')">
                                         Select
                                     </button>
                                 </div>

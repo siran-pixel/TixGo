@@ -8,46 +8,34 @@ def get_default_sections_for_event_type(event_type: str) -> List[Dict[str, Any]]
     """Returns sensible default dynamic section/row configurations by event category."""
     norm_type = (event_type or "").capitalize()
 
-    if norm_type == "Concert":
+    if norm_type in ["Concert", "Live show", "Live Show", "Shows", "Show"]:
         return [
             {
-                "name": "Elite",
+                "name": "VIP Lounge",
                 "section_type": "Section",
-                "price": 2500.0,
+                "price": 5000.0,
                 "color": "#a855f7",
-                "description": "Front stage VIP experience with plush seating",
+                "description": "Front stage VIP lounge experience with plush seating",
                 "rows": [
-                    {"row_name": "A", "seat_count": 10},
-                    {"row_name": "B", "seat_count": 10},
-                    {"row_name": "C", "seat_count": 10},
+                    {"row_name": "VIP-A", "seat_count": 25},
+                    {"row_name": "VIP-B", "seat_count": 25},
                 ],
             },
             {
-                "name": "Platinum",
+                "name": "Gold",
                 "section_type": "Section",
-                "price": 1500.0,
-                "color": "#3b82f6",
-                "description": "Prime elevated view directly facing the main stage",
-                "rows": [
-                    {"row_name": "A", "seat_count": 10},
-                    {"row_name": "B", "seat_count": 15},
-                    {"row_name": "C", "seat_count": 15},
-                    {"row_name": "D", "seat_count": 20},
-                ],
+                "price": 2500.0,
+                "color": "#eab308",
+                "description": "Prime view facing the main stage",
+                "rows": [{"row_name": f"G-{chr(65+i)}", "seat_count": 25} for i in range(20)],
             },
             {
                 "name": "Silver",
                 "section_type": "Section",
-                "price": 800.0,
+                "price": 1500.0,
                 "color": "#94a3b8",
-                "description": "Great atmosphere with clear acoustics",
-                "rows": [
-                    {"row_name": "A", "seat_count": 20},
-                    {"row_name": "B", "seat_count": 20},
-                    {"row_name": "C", "seat_count": 20},
-                    {"row_name": "D", "seat_count": 25},
-                    {"row_name": "E", "seat_count": 25},
-                ],
+                "description": "Great atmosphere with tiered acoustics",
+                "rows": [{"row_name": f"S-{i+1:02d}", "seat_count": 25} for i in range(80)],
             },
         ]
     elif norm_type == "Cricket":
@@ -89,30 +77,34 @@ def get_default_sections_for_event_type(event_type: str) -> List[Dict[str, Any]]
             },
         ]
     else:
-        # General / Theater / Comedy Show
+        # General / Comedy Show / Theater
         return [
             {
-                "name": "VIP Front",
+                "name": "VIP Lounge",
                 "section_type": "Section",
-                "price": 999.0,
-                "color": "#f97316",
-                "description": "Front row seats near the stage",
+                "price": 2000.0,
+                "color": "#a855f7",
+                "description": "VIP Lounge front row show seating",
                 "rows": [
-                    {"row_name": "A", "seat_count": 15},
-                    {"row_name": "B", "seat_count": 15},
+                    {"row_name": "VIP-A", "seat_count": 25},
+                    {"row_name": "VIP-B", "seat_count": 25},
                 ],
             },
             {
-                "name": "General Admission",
+                "name": "Gold",
                 "section_type": "Section",
-                "price": 499.0,
-                "color": "#64748b",
-                "description": "Standard comfortable tiered seating",
-                "rows": [
-                    {"row_name": "C", "seat_count": 20},
-                    {"row_name": "D", "seat_count": 20},
-                    {"row_name": "E", "seat_count": 20},
-                ],
+                "price": 1200.0,
+                "color": "#eab308",
+                "description": "Central prime show seating",
+                "rows": [{"row_name": f"G-{chr(65+i)}", "seat_count": 25} for i in range(20)],
+            },
+            {
+                "name": "Silver",
+                "section_type": "Section",
+                "price": 600.0,
+                "color": "#94a3b8",
+                "description": "Tiered auditorium seating",
+                "rows": [{"row_name": f"S-{i+1:02d}", "seat_count": 25} for i in range(80)],
             },
         ]
 
@@ -367,96 +359,187 @@ def generate_seats_for_event(
                         seat_index=s,
                     ))
 
-    elif event_type == "Concert":
-        # 1050 seats: Elite (50 @ 3000), Gold (200 @ 2000), Silver (800 @ 1000)
-        # Elite Section
-        elite_rows = [{"row_name": "E", "seat_count": 50}]
-        sec_elite = EventSection(
-            event_id=event.id,
-            name="Elite Section",
-            section_type="Section",
-            price=3000.00,
-            color="#a855f7",
-            description="Front row stage-side luxury seating",
-            row_config=json.dumps(elite_rows),
-            display_order=1,
-            total_seats=50,
-        )
-        db.session.add(sec_elite)
-        db.session.flush()
-
-        for i in range(1, 51):
-            seats_to_insert.append(Seat(
+    elif event_type in ["Concert", "Live Show", "Live show"]:
+        if custom_capacity >= 2000:
+            # VIP Lounge (50 @ 5000), Gold (500 @ 2500), Silver (2000 @ 1500) = 2550 seats
+            vip_rows = [{"row_name": "VIP-A", "seat_count": 25}, {"row_name": "VIP-B", "seat_count": 25}]
+            sec_vip = EventSection(
                 event_id=event.id,
-                seat_number=f"ELITE-{i}",
-                section="Elite Section",
-                category="Elite",
+                name="VIP Lounge",
+                section_type="Section",
+                price=5000.00,
+                color="#a855f7",
+                description="VIP Lounge stage-side seating",
+                row_config=json.dumps(vip_rows),
+                display_order=1,
+                total_seats=50,
+            )
+            db.session.add(sec_vip)
+            db.session.flush()
+
+            for r_name in ["VIP-A", "VIP-B"]:
+                for s in range(1, 26):
+                    seats_to_insert.append(Seat(
+                        event_id=event.id,
+                        seat_number=f"VIPLOU-{r_name}{s}",
+                        section="VIP Lounge",
+                        category="VIP Lounge",
+                        price=5000.00,
+                        status="AVAILABLE",
+                        section_id=sec_vip.id,
+                        row_label=r_name,
+                        seat_index=s,
+                    ))
+
+            gold_rows = [{"row_name": f"G-{chr(65+i)}", "seat_count": 25} for i in range(20)]
+            sec_gold = EventSection(
+                event_id=event.id,
+                name="Gold",
+                section_type="Section",
+                price=2500.00,
+                color="#eab308",
+                description="Gold prime central seating",
+                row_config=json.dumps(gold_rows),
+                display_order=2,
+                total_seats=500,
+            )
+            db.session.add(sec_gold)
+            db.session.flush()
+
+            for r_idx in range(20):
+                r_name = f"G-{chr(65+r_idx)}"
+                for s in range(1, 26):
+                    seats_to_insert.append(Seat(
+                        event_id=event.id,
+                        seat_number=f"GOLD-{r_name}{s}",
+                        section="Gold",
+                        category="Gold",
+                        price=2500.00,
+                        status="AVAILABLE",
+                        section_id=sec_gold.id,
+                        row_label=r_name,
+                        seat_index=s,
+                    ))
+
+            silver_rows = [{"row_name": f"S-{i+1:02d}", "seat_count": 25} for i in range(80)]
+            sec_silver = EventSection(
+                event_id=event.id,
+                name="Silver",
+                section_type="Section",
+                price=1500.00,
+                color="#94a3b8",
+                description="Silver auditorium seating",
+                row_config=json.dumps(silver_rows),
+                display_order=3,
+                total_seats=2000,
+            )
+            db.session.add(sec_silver)
+            db.session.flush()
+
+            for r_idx in range(1, 81):
+                r_name = f"S-{r_idx:02d}"
+                for s in range(1, 26):
+                    seats_to_insert.append(Seat(
+                        event_id=event.id,
+                        seat_number=f"SILVER-{r_name}-{s}",
+                        section="Silver",
+                        category="Silver",
+                        price=1500.00,
+                        status="AVAILABLE",
+                        section_id=sec_silver.id,
+                        row_label=r_name,
+                        seat_index=s,
+                    ))
+        else:
+            # 1050 seats legacy format
+            # Elite Section
+            elite_rows = [{"row_name": "E", "seat_count": 50}]
+            sec_elite = EventSection(
+                event_id=event.id,
+                name="Elite Section",
+                section_type="Section",
                 price=3000.00,
-                status="AVAILABLE",
-                section_id=sec_elite.id,
-                row_label="E",
-                seat_index=i,
-            ))
+                color="#a855f7",
+                description="Front row stage-side luxury seating",
+                row_config=json.dumps(elite_rows),
+                display_order=1,
+                total_seats=50,
+            )
+            db.session.add(sec_elite)
+            db.session.flush()
 
-        # Gold Section
-        gold_rows = [{"row_name": f"G{r}", "seat_count": 20} for r in range(1, 11)]
-        sec_gold = EventSection(
-            event_id=event.id,
-            name="Gold Section",
-            section_type="Section",
-            price=2000.00,
-            color="#eab308",
-            description="Premium central seating block",
-            row_config=json.dumps(gold_rows),
-            display_order=2,
-            total_seats=200,
-        )
-        db.session.add(sec_gold)
-        db.session.flush()
-
-        for r in range(1, 11):
-            for s in range(1, 21):
+            for i in range(1, 51):
                 seats_to_insert.append(Seat(
                     event_id=event.id,
-                    seat_number=f"G{r}-{s}",
-                    section="Gold Section",
-                    category="Gold",
-                    price=2000.00,
+                    seat_number=f"ELITE-{i}",
+                    section="Elite Section",
+                    category="Elite",
+                    price=3000.00,
                     status="AVAILABLE",
-                    section_id=sec_gold.id,
-                    row_label=f"G{r}",
-                    seat_index=s,
+                    section_id=sec_elite.id,
+                    row_label="E",
+                    seat_index=i,
                 ))
 
-        # Silver Section
-        silver_rows = [{"row_name": f"S{r}", "seat_count": 40} for r in range(1, 21)]
-        sec_silver = EventSection(
-            event_id=event.id,
-            name="Silver Section",
-            section_type="Section",
-            price=1000.00,
-            color="#94a3b8",
-            description="Tiered auditorium seating",
-            row_config=json.dumps(silver_rows),
-            display_order=3,
-            total_seats=800,
-        )
-        db.session.add(sec_silver)
-        db.session.flush()
+            # Gold Section
+            gold_rows = [{"row_name": f"G{r}", "seat_count": 20} for r in range(1, 11)]
+            sec_gold = EventSection(
+                event_id=event.id,
+                name="Gold Section",
+                section_type="Section",
+                price=2000.00,
+                color="#eab308",
+                description="Premium central seating block",
+                row_config=json.dumps(gold_rows),
+                display_order=2,
+                total_seats=200,
+            )
+            db.session.add(sec_gold)
+            db.session.flush()
 
-        for r in range(1, 21):
-            for s in range(1, 41):
-                seats_to_insert.append(Seat(
-                    event_id=event.id,
-                    seat_number=f"S{r}-{s}",
-                    section="Silver Section",
-                    category="Silver",
-                    price=1000.00,
-                    status="AVAILABLE",
-                    section_id=sec_silver.id,
-                    row_label=f"S{r}",
-                    seat_index=s,
-                ))
+            for r in range(1, 11):
+                for s in range(1, 21):
+                    seats_to_insert.append(Seat(
+                        event_id=event.id,
+                        seat_number=f"G{r}-{s}",
+                        section="Gold Section",
+                        category="Gold",
+                        price=2000.00,
+                        status="AVAILABLE",
+                        section_id=sec_gold.id,
+                        row_label=f"G{r}",
+                        seat_index=s,
+                    ))
+
+            # Silver Section
+            silver_rows = [{"row_name": f"S{r}", "seat_count": 40} for r in range(1, 21)]
+            sec_silver = EventSection(
+                event_id=event.id,
+                name="Silver Section",
+                section_type="Section",
+                price=1000.00,
+                color="#94a3b8",
+                description="Tiered auditorium seating",
+                row_config=json.dumps(silver_rows),
+                display_order=3,
+                total_seats=800,
+            )
+            db.session.add(sec_silver)
+            db.session.flush()
+
+            for r in range(1, 21):
+                for s in range(1, 41):
+                    seats_to_insert.append(Seat(
+                        event_id=event.id,
+                        seat_number=f"S{r}-{s}",
+                        section="Silver Section",
+                        category="Silver",
+                        price=1000.00,
+                        status="AVAILABLE",
+                        section_id=sec_silver.id,
+                        row_label=f"S{r}",
+                        seat_index=s,
+                    ))
 
     else:
         # General Show: custom capacity and price <= 1000

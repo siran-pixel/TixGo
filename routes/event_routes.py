@@ -50,11 +50,9 @@ def events_catalog():
 
 @event_bp.route("/events/<int:event_id>")
 def event_details(event_id: int):
-    """Detailed event overview page."""
-    event = db.session.get(Event, event_id)
-    if not event:
-        abort(404)
-    return render_template("event_details.html", event=event)
+    """Directly renders the ticket booking / seat selection section."""
+    from routes.seat_routes import seat_selection_view
+    return seat_selection_view(event_id)
 
 
 # REST API endpoints

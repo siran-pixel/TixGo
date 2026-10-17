@@ -22,11 +22,11 @@ def validate_password(password: str) -> Tuple[bool, Optional[str]]:
 
 
 def validate_phone(phone: str) -> bool:
-    """Validates phone number format."""
+    """Validates phone number format: must be exactly 10 digits."""
     if not phone or not isinstance(phone, str):
         return False
     cleaned = re.sub(r"[\s\-\(\)\+]", "", phone)
-    return len(cleaned) >= 10 and len(cleaned) <= 15 and cleaned.isdigit()
+    return len(cleaned) == 10 and cleaned.isdigit()
 
 
 def validate_attendee_data(attendee: Dict[str, Any]) -> Tuple[bool, Optional[str]]:

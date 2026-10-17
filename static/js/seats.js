@@ -305,6 +305,116 @@ class SeatMapEngine {
                 features: ["tickets_together", "Full Corporate Box Hospitality"],
                 tag: { text: "Corporate Luxury", type: "best-deal", icon: "fa-solid fa-gem" },
                 matchKeywords: ["p corp", "corporate box", "stand i"]
+            },
+            {
+                name: "C Stand",
+                sectorSelector: ".sector-c-stand",
+                row: "Row C",
+                price: 3850,
+                rating: "8.4 Great",
+                features: ["tickets_together", "Clear view", "Instant download"],
+                tag: { text: "Best value", type: "best-price", icon: "fa-solid fa-tag" },
+                matchKeywords: ["stand c", "c - lower", "c - upper", "c"]
+            },
+            {
+                name: "E Stand",
+                sectorSelector: ".sector-e-stand",
+                row: "Row E",
+                price: 4500,
+                rating: "8.6 Great",
+                features: ["tickets_together", "Clear view", "Mid Stand Elevation"],
+                tag: { text: "Popular", type: "best-price", icon: "fa-solid fa-fire" },
+                matchKeywords: ["stand e - upper", "stand e", "e"]
+            },
+            {
+                name: "Block 1",
+                sectorSelector: ".sector-block-1",
+                row: "Row 1",
+                price: 4150,
+                rating: "8.2 Great",
+                features: ["tickets_together", "Inner Ring Pitch View"],
+                tag: { text: "Pitch view", type: "best-deal", icon: "fa-solid fa-star" },
+                matchKeywords: ["stand g - lower", "stand g", "g"]
+            },
+            {
+                name: "Block 2",
+                sectorSelector: ".sector-block-2",
+                row: "Row 2",
+                price: 4150,
+                rating: "8.3 Great",
+                features: ["tickets_together", "Clear view", "Near Boundary"],
+                tag: { text: "Selling fast", type: "selling-fast", icon: "fa-solid fa-fire" },
+                matchKeywords: ["stand g - upper", "stand g"]
+            },
+            {
+                name: "P3 Block 2",
+                sectorSelector: ".sector-p3-block2",
+                row: "Row P3",
+                price: 4950,
+                rating: "8.8 Great",
+                features: ["tickets_together", "Clear view", "Elevated Sightline"],
+                tag: { text: "Great view", type: "best-price", icon: "fa-solid fa-thumbs-up" },
+                matchKeywords: ["stand a - upper", "stand a"]
+            },
+            {
+                name: "P1 Annexe Stand",
+                sectorSelector: ".sector-p1-annexe",
+                row: "Row P1",
+                price: 4850,
+                rating: "8.5 Great",
+                features: ["tickets_together", "Annexe View & Easy Entry"],
+                tag: { text: "Annexe Stand", type: "best-deal", icon: "fa-solid fa-bookmark" },
+                matchKeywords: ["stand f - upper", "stand f"]
+            },
+            {
+                name: "GR Vishwanath Stand P2",
+                sectorSelector: ".sector-p2-vishwanath",
+                row: "Row P2",
+                price: 5450,
+                rating: "9.1 Amazing",
+                features: ["tickets_together", "Prime Boundary Action View"],
+                tag: { text: "Pavilion View", type: "best-deal", icon: "fa-solid fa-crown" },
+                matchKeywords: ["stand d - upper", "stand d"]
+            },
+            {
+                name: "M3 / M4",
+                sectorSelector: ".sector-m4",
+                row: "Row M",
+                price: 3950,
+                rating: "8.0 Good",
+                features: ["tickets_together", "Clear view of pitch"],
+                tag: { text: "Value ticket", type: "best-price", icon: "fa-solid fa-tag" },
+                matchKeywords: ["stand h - lower", "stand h"]
+            },
+            {
+                name: "M4 Stand",
+                sectorSelector: ".sector-m-inner",
+                row: "Row M4",
+                price: 3950,
+                rating: "8.1 Good",
+                features: ["tickets_together", "Inner Ring Seating"],
+                tag: { text: "Inner stand", type: "best-price", icon: "fa-solid fa-ticket" },
+                matchKeywords: ["stand i - lower", "stand i"]
+            },
+            {
+                name: "M2 / M1",
+                sectorSelector: ".sector-m-inner-south",
+                row: "Row M2",
+                price: 3750,
+                rating: "7.9 Good",
+                features: ["tickets_together", "Budget-Friendly Seating"],
+                tag: { text: "Budget deal", type: "best-price", icon: "fa-solid fa-tag" },
+                matchKeywords: ["stand i - upper", "stand i"]
+            },
+            {
+                name: "P1 Stand",
+                sectorSelector: ".sector-p1-inner",
+                row: "Row P1",
+                price: 4200,
+                rating: "8.3 Great",
+                features: ["tickets_together", "Close to Pitch"],
+                tag: { text: "Inner pitch view", type: "best-deal", icon: "fa-solid fa-star" },
+                matchKeywords: ["stand c - lower", "stand c"]
             }
         ];
 
@@ -469,6 +579,15 @@ class SeatMapEngine {
             }
         }
 
+        // Highlight active floating badge pill
+        document.querySelectorAll('.floating-badge-pill').forEach(pill => {
+            pill.classList.remove('active-pill');
+        });
+        const activePill = document.querySelector(`.floating-badge-pill[data-stand="${standName}"]`);
+        if (activePill) {
+            activePill.classList.add('active-pill');
+        }
+
         // Reserve matching tickets in this stand
         const seatsPool = (this.cricketStandSeatsMap && this.cricketStandSeatsMap.get(standName)) || this.seatsData;
         const available = seatsPool.filter(s => s.status === 'AVAILABLE' || s.is_my_lock);
@@ -497,7 +616,19 @@ class SeatMapEngine {
     renderConcertLayout(container) {
         const sections = this.groupSeatsBySectionAndRow(this.seatsData);
 
-        for (const [sectionName, rows] of Object.entries(sections)) {
+        const orderedSectionNames = Object.keys(sections).sort((a, b) => {
+            const secA = (this.sections || []).find(s => s.name && s.name.toLowerCase() === a.toLowerCase());
+            const secB = (this.sections || []).find(s => s.name && s.name.toLowerCase() === b.toLowerCase());
+            if (secA && secB && secA.display_order !== undefined && secB.display_order !== undefined) {
+                return secA.display_order - secB.display_order;
+            }
+            const priceA = Object.values(sections[a])[0]?.[0]?.price || 0;
+            const priceB = Object.values(sections[b])[0]?.[0]?.price || 0;
+            return priceB - priceA;
+        });
+
+        for (const sectionName of orderedSectionNames) {
+            const rows = sections[sectionName];
             const sectionDiv = document.createElement('div');
             sectionDiv.className = 'seat-section-block';
 
@@ -541,7 +672,19 @@ class SeatMapEngine {
     renderGeneralLayout(container) {
         const sections = this.groupSeatsBySectionAndRow(this.seatsData);
 
-        for (const [sectionName, rows] of Object.entries(sections)) {
+        const orderedSectionNames = Object.keys(sections).sort((a, b) => {
+            const secA = (this.sections || []).find(s => s.name && s.name.toLowerCase() === a.toLowerCase());
+            const secB = (this.sections || []).find(s => s.name && s.name.toLowerCase() === b.toLowerCase());
+            if (secA && secB && secA.display_order !== undefined && secB.display_order !== undefined) {
+                return secA.display_order - secB.display_order;
+            }
+            const priceA = Object.values(sections[a])[0]?.[0]?.price || 0;
+            const priceB = Object.values(sections[b])[0]?.[0]?.price || 0;
+            return priceB - priceA;
+        });
+
+        for (const sectionName of orderedSectionNames) {
+            const rows = sections[sectionName];
             const sectionDiv = document.createElement('div');
             sectionDiv.className = 'seat-section-block';
 

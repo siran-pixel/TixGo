@@ -46,6 +46,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (signupForm) {
         checkPasswordMatch('password', 'confirmPassword', 'passwordMismatchError');
+
+        const phoneInput = document.getElementById('phone');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', () => {
+                phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, 10);
+                if (phoneInput.value.length === 10) {
+                    phoneInput.setCustomValidity('');
+                } else {
+                    phoneInput.setCustomValidity('Phone number must be exactly 10 digits.');
+                }
+            });
+        }
     }
 
     if (resetForm) {
